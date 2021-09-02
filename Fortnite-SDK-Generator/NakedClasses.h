@@ -88,7 +88,7 @@ public:
 class FUObjectArray
 {
 public:
-	int8 pad[0x10];
+	uint8 pad[0x10];
 	TUObjectArray objObjects;
 
 	inline UObject* ByIndex(int32 index)
@@ -120,7 +120,7 @@ public:
 	UField* children;
 	int32 propertySize;
 	int32 minAlignment;
-	int8 pad_0[0x40];
+	uint8 pad_0[0x40];
 };
 
 class UScriptStruct : public UStruct
@@ -138,7 +138,15 @@ public:
 class UFunction : public UStruct
 {
 public:
-	//0x28 void* function;
+	
+	uint32 functionFlags;
+	uint16 repOffset;
+	uint8 numberParams;
+	int8 pad_0[0x1];
+	uint16_t sizeParams;
+	uint16_t offsetReturnValue;
+	uint8 pad_1[0x1C];
+	void* func;
 };
 
 
