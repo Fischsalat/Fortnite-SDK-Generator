@@ -16,7 +16,16 @@ std::string FName::ToString() const
 	FString outStr;
 	fToString(this, &outStr);
 
-	return outStr.ToString();
+	std::string outName = outStr.ToString();
+
+	if (number > 0)
+		outName += '_' + std::to_string(number);
+
+	auto pos = outName.rfind('/');
+	if (pos == std::string::npos)
+		return outName;
+
+	return outName.substr(pos + 1);
 }
 
 std::string UObject::GetName() const
@@ -24,16 +33,7 @@ std::string UObject::GetName() const
 	if (!this)
 		return "";
 
-	std::string objName = name.ToString();
-
-	if (name.number > 0)
-		objName += '_' + std::to_string(name.number);
-
-	auto pos = objName.rfind('/');
-	if (pos == std::string::npos)
-		return objName;
-
-	return objName.substr(pos + 1);
+	return name.ToString();
 }
 
 std::string UObject::GetFullName() const

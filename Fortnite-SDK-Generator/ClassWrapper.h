@@ -20,12 +20,10 @@ public:
 
 	bool IsVaild() const;
 
-	inline std::string GetName() const;
-
-	inline UEObject GetOuter() const;
-
-	inline UEClass GetClass() const;
-
+	std::string GetName() const;
+	std::string GetFullName() const;
+	UEObject GetOuter() const;
+	UEClass GetClass() const;
 	UEClass StaticClass() const;
 };
 
@@ -34,13 +32,22 @@ class UEField : public UEObject
 public:
 	using UEObject::UEObject;
 
-	inline UEField GetNext() const;
+	bool IsNextValid() const;
+	UEField GetNext() const;
 
 	UEClass StaticClass() const;
 };
 
-class UEEnum
+class UEEnum : public UEField
 {
+public:
+	using UEField::UEField;
+	
+	const UEnum::ECppForm GetCppForm() const;
+	std::string GetSingleName(int32 index) const;
+	std::vector<std::string> GetAllNames() const;
+	std::string GetEnumType() const;
+
 	UEClass StaticClass() const;
 };
 
@@ -49,6 +56,9 @@ class UEStruct : public UEField
 public:
 	using UEField::UEField;
 
+	UEStruct GetSuper() const;
+	UEField GetChildren() const;
+
 	UEClass StaticClass() const;
 };
 
@@ -56,6 +66,8 @@ class UEClass : public UEStruct
 {
 public:
 	using UEStruct::UEStruct;
+
+	UEObject GetDefaultObject() const;
 
 	UEClass StaticClass() const;
 };

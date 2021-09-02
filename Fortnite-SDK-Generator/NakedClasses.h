@@ -41,6 +41,14 @@ public:
 	}
 };
 
+template<typename Value, typename Key>
+class TPair
+{
+public:
+	Value value;
+	Key key;
+};
+
 
 class FName
 {
@@ -107,12 +115,6 @@ public:
 	UField* next;
 };
 
-struct EnumName
-{
-	FName name;
-	int64 enumValue;
-};
-
 class UEnum : public UField
 {
 public:
@@ -123,7 +125,7 @@ public:
 		EnumClass
 	};
 	FString cppType;
-	TArray<EnumName> names;
+	TArray<TPair<FName, int64>> names;
 	ECppForm cppForm;
 	uint8 pad_0[0x10];
 };
