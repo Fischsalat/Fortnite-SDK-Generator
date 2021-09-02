@@ -35,9 +35,6 @@
     <ClInclude Include="NakedClasses.h">
       <Filter>Headerdateien\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Offsets.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="CoreFunctions.h">
       <Filter>Headerdateien\Engine</Filter>
     </ClInclude>

@@ -8,6 +8,16 @@ bool UEObject::IsVaild() const
 	return object != nullptr;
 }
 //----------------------------------------
+bool UEObject::operator==(UEObject other) const
+{
+	return object == other.object;
+}
+//----------------------------------------
+bool UEObject::operator!=(UEObject other) const
+{
+	return object != other.object;
+}
+//----------------------------------------
 std::string UEObject::GetName() const
 {
 	return object->GetName();
@@ -100,6 +110,16 @@ UEField UEStruct::GetChildren() const
 {
 	return UEField(static_cast<UStruct*>(object)->children);
 }
+//----------------------------------------
+int32 UEStruct::GetStructSize() const
+{
+	return static_cast<UStruct*>(object)->propertySize;
+}
+//----------------------------------------
+int32 UEStruct::GetAlignmetn() const
+{
+	return static_cast<UStruct*>(object)->minAlignment;
+}
 //-----------------------------------------------
 UEClass UEStruct::StaticClass() const
 {
@@ -111,4 +131,64 @@ UEObject UEClass::GetDefaultObject() const
 {
 	return UEObject(static_cast<UClass*>(object)->defaultObject);
 }
-
+//-----------------------------------------------
+UEClass UEClass::StaticClass() const
+{
+	return UEClass(FindClass("Class CoreUObject.Class"));
+}
+//UEFunction
+//-----------------------------------------------------------------------------------------------
+EFunctionFlags UEFunction::GetFunctionFlags() const
+{
+	return static_cast<UFunction*>(object)->functionFlags;
+}
+//----------------------------------------
+uint8 UEFunction::GetNumParams() const
+{
+	return static_cast<UFunction*>(object)->numberParams;
+}
+//----------------------------------------
+uint16 UEFunction::GetParamSize() const
+{
+	return static_cast<UFunction*>(object)->sizeParams;
+}
+uint16 UEFunction::GetRetOffset() const
+{
+	return static_cast<UFunction*>(object)->offsetReturnValue;
+}
+//-----------------------------------------------
+UEClass UEFunction::StaticClass() const
+{
+	return UEClass(FindClass("Class CoreUObject.Function"));
+}
+//UEProperty
+//-----------------------------------------------------------------------------------------------
+int32 UEProperty::GetElementSize() const
+{
+	return static_cast<UProperty*>(object)->elementSize;
+}
+//----------------------------------------
+int32 UEProperty::GetArrayDim() const
+{
+	return static_cast<UProperty*>(object)->arrayDim;
+}
+//----------------------------------------
+EPropertyFlags UEProperty::GetPropertyFlags() const
+{
+	return static_cast<UProperty*>(object)->propFlags;
+}
+//----------------------------------------
+int32 UEProperty::GetOffset() const
+{
+	return static_cast<UProperty*>(object)->offsetInternal;
+}
+//----------------------------------------
+UEProperty UEProperty::GetNextProperty() const
+{
+	return UEProperty(static_cast<UProperty*>(object)->propertyLinkNext);
+}
+//-----------------------------------------------
+UEClass UEProperty::StaticClass() const
+{
+	return UEClass(FindClass("Class CoreUObject.Property"));
+}

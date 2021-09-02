@@ -57,6 +57,15 @@ public:
 	int32 number;
 
 	std::string ToString() const;
+
+	inline bool operator==(FName other)
+	{
+		return comparisonIndex == other.comparisonIndex;
+	}
+	inline bool operator!=(FName other)
+	{
+		return comparisonIndex != other.comparisonIndex;
+	}
 };
 
 class UClass;
@@ -174,7 +183,7 @@ public:
 	int32 arrayDim;
 	int32 elementSize;
 	int8 pad_25[0x10];
-	EPropertyFlags flags;
+	EPropertyFlags propFlags;
 	int32_t offsetInternal;
 	int8 pad_30[0x4];
 	UProperty* propertyLinkNext;
