@@ -107,10 +107,25 @@ public:
 	UField* next;
 };
 
+struct EnumName
+{
+	FName name;
+	int64 enumValue;
+};
+
 class UEnum : public UField
 {
 public:
-
+	enum class ECppForm : int64
+	{
+		Regular,
+		Namespaced,
+		EnumClass
+	};
+	FString cppType;
+	TArray<EnumName> names;
+	ECppForm cppForm;
+	uint8 pad_0[0x10];
 };
 
 class UStruct : public UField
@@ -120,33 +135,34 @@ public:
 	UField* children;
 	int32 propertySize;
 	int32 minAlignment;
-	uint8 pad_0[0x40];
-};
-
-class UScriptStruct : public UStruct
-{
-public:
-
+	uint8 pad_5[0x40];
 };
 
 class UClass : public UStruct
 {
 public:
-
+	uint8 pad_10[0x88];
+	UObject* defaultObject;
 };
 
 class UFunction : public UStruct
 {
 public:
 	
-	uint32 functionFlags;
+	EFunctionFlags functionFlags;
 	uint16 repOffset;
 	uint8 numberParams;
-	int8 pad_0[0x1];
+	int8 pad_15[0x1];
 	uint16 sizeParams;
 	uint16 offsetReturnValue;
-	uint8 pad_1[0x1C];
+	uint8 pad_20[0x1C];
 	void* func;
+};
+
+class UScriptStruct : public UStruct
+{
+public:
+	uint8 pad_7[0x18];
 };
 
 
@@ -155,12 +171,12 @@ class UProperty : public UField
 public:
 	int32 arrayDim;
 	int32 elementSize;
-	int8 pad_0[0x10];
+	int8 pad_25[0x10];
 	EPropertyFlags flags;
 	int32_t offsetInternal;
-	int8 pad_1[0x4];
+	int8 pad_30[0x4];
 	UProperty* propertyLinkNext;
-	int8 pad_2[0x18];
+	int8 pad_35[0x18];
 };
 
 class UStructProperty : public UProperty

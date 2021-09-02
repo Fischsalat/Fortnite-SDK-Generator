@@ -1,10 +1,10 @@
 #pragma once
-#include "Classes.h"
+#include "NakedClasses.h"
 #include "Global.h"
 
 
 template<typename T>
-inline T* FindObject(std::string objectName)
+T* FindObject(std::string objectName)
 {
 	for (int i = 0; i < GObjects->Num(); i++)
 	{
@@ -22,3 +22,9 @@ inline T* FindObject(std::string objectName)
 	}
 	return nullptr;
 }
+
+inline UClass* FindClass(std::string className)
+{
+	return FindObject<UClass>(className);
+}
+

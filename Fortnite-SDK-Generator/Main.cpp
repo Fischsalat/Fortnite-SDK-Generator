@@ -15,7 +15,6 @@ DWORD WINAPI Main(LPVOID lpParam)
 
 	GObjects = reinterpret_cast<FUObjectArray*>(reinterpret_cast<uintptr_t>(GetModuleHandle(0)) + Offset::GObjects); //1.2
 
-	DynamicFindObject();
 
 	return 0;
 }

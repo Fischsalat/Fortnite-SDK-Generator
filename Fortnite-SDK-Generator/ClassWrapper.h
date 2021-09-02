@@ -1,6 +1,7 @@
 #pragma once
 #include "Global.h"
 #include "NakedClasses.h"
+#include "CoreFunctions.h"
 
 class UEClass;
 
@@ -17,23 +18,15 @@ public:
 	{
 	}
 
-	inline bool IsVaild() const
-	{
-		return object != nullptr;
-	}
+	bool IsVaild() const;
 
-	inline std::string GetName() const
-	{
-		return object->GetName();
-	}
-	inline UEObject GetOuter() const
-	{
-		return UEObject(object->outer);
-	}
-	inline UEClass GetClass() const
-	{
-		return UEClass(object->privateClass);
-	}
+	inline std::string GetName() const;
+
+	inline UEObject GetOuter() const;
+
+	inline UEClass GetClass() const;
+
+	UEClass StaticClass() const;
 };
 
 class UEField : public UEObject
@@ -41,10 +34,14 @@ class UEField : public UEObject
 public:
 	using UEObject::UEObject;
 
-	inline UEField GetNext() const
-	{
-		return reinterpret_cast<UField*>(object)->next;
-	}
+	inline UEField GetNext() const;
+
+	UEClass StaticClass() const;
+};
+
+class UEEnum
+{
+	UEClass StaticClass() const;
 };
 
 class UEStruct : public UEField
@@ -52,21 +49,19 @@ class UEStruct : public UEField
 public:
 	using UEField::UEField;
 
+	UEClass StaticClass() const;
 };
 
 class UEClass : public UEStruct
 {
 public:
 	using UEStruct::UEStruct;
-};
 
-class UEEnum
-{
-
+	UEClass StaticClass() const;
 };
 
 class UEProperty
 {
-
+	UEClass StaticClass() const;
 };
 
