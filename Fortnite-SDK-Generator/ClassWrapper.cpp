@@ -3,11 +3,6 @@
 
 //UEObject
 //-----------------------------------------------------------------------------------------------
-bool UEObject::IsVaild() const
-{
-	return object != nullptr;
-}
-//----------------------------------------
 bool UEObject::operator==(UEObject other) const
 {
 	return object == other.object;
@@ -16,6 +11,21 @@ bool UEObject::operator==(UEObject other) const
 bool UEObject::operator!=(UEObject other) const
 {
 	return object != other.object;
+}
+//----------------------------------------
+bool UEObject::IsVaild() const
+{
+	return object != nullptr;
+}
+//----------------------------------------
+int32 UEObject::GetFlags() const
+{
+	return object->flags;
+}
+//----------------------------------------
+int32 UEObject::GetInernalIndex() const
+{
+	return object->internalIndex;
 }
 //----------------------------------------
 std::string UEObject::GetName() const
@@ -37,8 +47,28 @@ UEClass UEObject::GetClass() const
 {
 	return UEClass(object->privateClass);
 }
+//----------------------------------------
+template<typename T>
+bool UEObject::IsA() const
+{
+	if (this->GetClass().IsVaild())
+	{
+		for (UEClass clss = this->GetClass(); clss.IsVaild(); clss = clss.GetSuper().Cast<UEClass>())
+		{
+			if (clss == T::StaticClass())
+				return true;
+		}
+		return false;
+	}
+}
+//----------------------------------------
+template<typename T>
+T UEObject::Cast() const
+{
+	return reinterpret_cast<T>(this);
+}
 //-----------------------------------------------
-UEClass UEObject::StaticClass() const
+UEClass UEObject::StaticClass()
 {
 	return UEClass(FindClass("Class CoreUObject.Object"));
 }
@@ -54,7 +84,7 @@ UEField UEField::GetNext() const
 	return UEField(static_cast<UField*>(object)->next);
 }
 //-----------------------------------------------
-UEClass UEField::StaticClass() const
+UEClass UEField::StaticClass()
 {
 	return UEClass(FindClass("Class CoreUObject.Field"));
 }
@@ -95,7 +125,7 @@ std::string UEEnum::GetEnumType() const
 	return temp.substr(0, temp.find_first_of(":"));
 }
 //-----------------------------------------------
-UEClass UEEnum::StaticClass() const
+UEClass UEEnum::StaticClass()
 {
 	return UEClass(FindClass("Class CoreUObject.Enum"));
 }
@@ -121,7 +151,7 @@ int32 UEStruct::GetAlignmetn() const
 	return static_cast<UStruct*>(object)->minAlignment;
 }
 //-----------------------------------------------
-UEClass UEStruct::StaticClass() const
+UEClass UEStruct::StaticClass()
 {
 	return UEClass(FindClass("Class CoreUObject.Struct"));
 }
@@ -132,7 +162,7 @@ UEObject UEClass::GetDefaultObject() const
 	return UEObject(static_cast<UClass*>(object)->defaultObject);
 }
 //-----------------------------------------------
-UEClass UEClass::StaticClass() const
+UEClass UEClass::StaticClass()
 {
 	return UEClass(FindClass("Class CoreUObject.Class"));
 }
@@ -157,7 +187,7 @@ uint16 UEFunction::GetRetOffset() const
 	return static_cast<UFunction*>(object)->offsetReturnValue;
 }
 //-----------------------------------------------
-UEClass UEFunction::StaticClass() const
+UEClass UEFunction::StaticClass()
 {
 	return UEClass(FindClass("Class CoreUObject.Function"));
 }
@@ -188,7 +218,7 @@ UEProperty UEProperty::GetNextProperty() const
 	return UEProperty(static_cast<UProperty*>(object)->propertyLinkNext);
 }
 //-----------------------------------------------
-UEClass UEProperty::StaticClass() const
+UEClass UEProperty::StaticClass()
 {
 	return UEClass(FindClass("Class CoreUObject.Property"));
 }

@@ -29,7 +29,13 @@ public:
 	UEObject GetOuter() const;
 	UEClass GetClass() const;
 
-	UEClass StaticClass() const;
+	template<typename T>
+	bool IsA() const;
+	
+	template<typename T>
+	T Cast() const;
+
+	static UEClass StaticClass();
 };
 
 class UEField : public UEObject
@@ -40,7 +46,7 @@ public:
 	bool IsNextValid() const;
 	UEField GetNext() const;
 
-	UEClass StaticClass() const;
+	static UEClass StaticClass();
 };
 
 class UEEnum : public UEField
@@ -53,7 +59,7 @@ public:
 	std::vector<std::string> GetAllNames() const;
 	std::string GetEnumType() const;
 
-	UEClass StaticClass() const;
+	static UEClass StaticClass();
 };
 
 class UEStruct : public UEField
@@ -66,7 +72,7 @@ public:
 	int32 GetStructSize() const;
 	int32 GetAlignmetn() const;
 
-	UEClass StaticClass() const;
+	static UEClass StaticClass();
 };
 
 class UEClass : public UEStruct
@@ -76,7 +82,7 @@ public:
 
 	UEObject GetDefaultObject() const;
 
-	UEClass StaticClass() const;
+	static UEClass StaticClass();
 };
 
 class UEFunction : public UEStruct
@@ -89,7 +95,7 @@ public:
 	uint16 GetParamSize() const;
 	uint16 GetRetOffset() const;
 
-	UEClass StaticClass() const;
+	static UEClass StaticClass();
 };
 
 class UEProperty : public UEField
@@ -103,6 +109,6 @@ public:
 	int32 GetOffset() const;
 	UEProperty GetNextProperty() const;
 
-	UEClass StaticClass() const;
+	static UEClass StaticClass();
 };
 

@@ -4,6 +4,13 @@
 #include "Global.h"
 #include "CoreFunctions.h"
 
+/*
+* ToDo:
+* 
+* iterator for ObjectStore
+* 
+* Generator
+*/
 
 
 DWORD WINAPI Main(LPVOID lpParam)

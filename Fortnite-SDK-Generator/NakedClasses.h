@@ -49,7 +49,6 @@ public:
 	Key key;
 };
 
-
 class FName
 {
 public:
@@ -67,6 +66,7 @@ public:
 		return comparisonIndex != other.comparisonIndex;
 	}
 };
+
 
 class UClass;
 class UProperty;
@@ -224,6 +224,16 @@ class UMulticastDelegateProperty : public UProperty
 {
 public:
 
+};
+
+class UBoolProperty : public UProperty
+{
+public:
+	uint8 fieldSize;
+	uint8 byteOffset;
+	uint8 byteMask;
+	uint8 fieldMask;
+	uint8 pad_100[0x4];
 };
 
 class UMapProperty : public UProperty
