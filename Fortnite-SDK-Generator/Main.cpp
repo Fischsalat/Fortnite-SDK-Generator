@@ -20,8 +20,6 @@ DWORD WINAPI Main(LPVOID lpParam)
 	freopen_s(&p, "CONOUT$", "w", stdout);
 	freopen_s(&p, "CONIN$", "r", stdin);
 
-	GObjects = reinterpret_cast<FUObjectArray*>(reinterpret_cast<uintptr_t>(GetModuleHandle(0)) + Offset::GObjects); //1.2
-
 
 	return 0;
 }

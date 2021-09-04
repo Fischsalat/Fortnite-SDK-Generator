@@ -3,7 +3,7 @@
 // just in case: copyright epic games, flags are stright up copied from the UE4 source
 
 
-enum EPropertyFlags : uint64_t
+enum EPropertyFlags : uint64
 {
 	CPF_None = 0,
 
@@ -65,7 +65,7 @@ enum EPropertyFlags : uint64_t
 	CPF_SkipSerialization = 0x0080000000000000,	// Property shouldn't be serialized, can still be exported to text
 };
 
-enum EFunctionFlags : uint32_t
+enum EFunctionFlags : uint32
 {
 	// Function flags.
 	FUNC_None = 0x00000000,

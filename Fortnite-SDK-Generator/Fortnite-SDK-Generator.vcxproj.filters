@@ -27,6 +27,9 @@
     <ClCompile Include="ClassWrapper.cpp">
       <Filter>Headerdateien\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="ObjectStore.cpp">
+      <Filter>Headerdateien\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Global.h">
@@ -42,6 +45,9 @@
       <Filter>Headerdateien\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Flags.h">
+      <Filter>Headerdateien\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectStore.h">
       <Filter>Headerdateien\Engine</Filter>
     </ClInclude>
   </ItemGroup>

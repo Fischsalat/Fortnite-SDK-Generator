@@ -1,6 +1,13 @@
 #pragma once
 #include "ClassWrapper.h"
+#include "ObjectStore.h"
 
+//UEActor
+//-----------------------------------------------------------------------------------------------
+UEClass UEActor::StaticClass()
+{
+	return UEObjectStore::FindClass("Class Engine.Actor");
+}
 //UEObject
 //-----------------------------------------------------------------------------------------------
 bool UEObject::operator==(UEObject other) const
@@ -38,6 +45,20 @@ std::string UEObject::GetFullName() const
 	return object->GetFullName();
 }
 //----------------------------------------
+std::string UEObject::GetPrefixedName() const
+{
+	std::string name;
+
+	if (this->IsA<UEActor>())
+		name += 'A';
+	else if (this->IsA<UEObject>())
+		name += 'U';
+	else
+		name += 'F';
+	
+	return name += this->GetName();
+}
+//----------------------------------------
 UEObject UEObject::GetOuter() const
 {
 	return UEObject(object->outer);
@@ -70,7 +91,7 @@ T UEObject::Cast() const
 //-----------------------------------------------
 UEClass UEObject::StaticClass()
 {
-	return UEClass(FindClass("Class CoreUObject.Object"));
+	return UEObjectStore::FindClass("Class CoreUObject.Object");
 }
 //UEField
 //-----------------------------------------------------------------------------------------------
@@ -86,7 +107,7 @@ UEField UEField::GetNext() const
 //-----------------------------------------------
 UEClass UEField::StaticClass()
 {
-	return UEClass(FindClass("Class CoreUObject.Field"));
+	return UEObjectStore::FindClass("Class CoreUObject.Field");
 }
 //UEEnum
 //-----------------------------------------------------------------------------------------------
@@ -127,7 +148,7 @@ std::string UEEnum::GetEnumType() const
 //-----------------------------------------------
 UEClass UEEnum::StaticClass()
 {
-	return UEClass(FindClass("Class CoreUObject.Enum"));
+	return UEObjectStore::FindClass("Class CoreUObject.Enum");
 }
 //UESTruct
 //-----------------------------------------------------------------------------------------------
@@ -153,7 +174,7 @@ int32 UEStruct::GetAlignmetn() const
 //-----------------------------------------------
 UEClass UEStruct::StaticClass()
 {
-	return UEClass(FindClass("Class CoreUObject.Struct"));
+	return UEObjectStore::FindClass("Class CoreUObject.Struct");
 }
 //UEClass
 //-----------------------------------------------------------------------------------------------
@@ -164,7 +185,7 @@ UEObject UEClass::GetDefaultObject() const
 //-----------------------------------------------
 UEClass UEClass::StaticClass()
 {
-	return UEClass(FindClass("Class CoreUObject.Class"));
+	return UEObjectStore::FindClass("Class CoreUObject.Class");
 }
 //UEFunction
 //-----------------------------------------------------------------------------------------------
@@ -189,7 +210,7 @@ uint16 UEFunction::GetRetOffset() const
 //-----------------------------------------------
 UEClass UEFunction::StaticClass()
 {
-	return UEClass(FindClass("Class CoreUObject.Function"));
+	return UEObjectStore::FindClass("Class CoreUObject.Function");
 }
 //UEProperty
 //-----------------------------------------------------------------------------------------------
@@ -220,5 +241,164 @@ UEProperty UEProperty::GetNextProperty() const
 //-----------------------------------------------
 UEClass UEProperty::StaticClass()
 {
-	return UEClass(FindClass("Class CoreUObject.Property"));
+	return UEObjectStore::FindClass("Class CoreUObject.Property");
 }
+//UE_Properties
+//-----------------------------------------------------------------------------------------------
+// UE_ArrayProperty
+//-----------------------------------------------------------------------------------------------
+std::string UE_ArrayProperty::GetArrayType() const
+{
+	return static_cast<UArrayProperty*>(object)->innerProperty->innrStruct->GetName();
+}
+//----------------------------------------
+std::string UE_ArrayProperty::GetTypeStr() const
+{
+	return "TArray<" + GetArrayType() + ">" + " ";
+}
+//-----------------------------------------------
+UEClass UE_ArrayProperty::StaticClass()
+{
+	return UEObjectStore::FindClass("Class CoreUObject.ArrayProperty");
+}
+// UE_StructProperty
+//-----------------------------------------------------------------------------------------------
+UEStruct UE_StructProperty::GetInnerStruct() const
+{
+	return UEStruct(static_cast<UStructProperty*>(object)->innrStruct);
+}
+//----------------------------------------
+std::string UE_StructProperty::GetTypeStr() const
+{
+	return "struct " + GetInnerStruct().GetName() + " ";
+}
+//-----------------------------------------------
+UEClass UE_StructProperty::StaticClass()
+{
+	return UEObjectStore::FindClass("Class CoreUObject.StructProperty");
+}
+// UE_ObjectProperty
+//-----------------------------------------------------------------------------------------------
+UEClass UE_ObjectProperty::GetObjPropertyClass() const
+{
+	return UEClass(static_cast<UObjectProperty*>(object)->propertyClass);
+}
+//----------------------------------------
+std::string UE_ObjectProperty::GetTypeStr() const
+{
+	return "class " + GetObjPropertyClass().GetName() + " ";
+}
+//-----------------------------------------------
+UEClass UE_StructProperty::StaticClass()
+{
+	return UEObjectStore::FindClass("Class CoreUObject.ObjectProperty");
+}
+// UE_NumericalProperty
+//-----------------------------------------------------------------------------------------------
+UEClass UE_NumericalProperty::StaticClass()
+{
+	return UEObjectStore::FindClass("Class CoreUObject.NumericProperty");
+}
+// UE_NumericalProperties
+//-----------------------------------------------------------------------------------------------
+std::string UE_byteProperty::GetTypeStr() const
+{
+	return "uint16 " + GetName() + " ";
+}
+//-----------------------------------------------
+UEClass UE_byteProperty::StaticClass()
+{
+	return UEObjectStore::FindClass("Class CoreUObject.UInt16Property");
+}
+//-----------------------------------------------------------------------------------------------
+std::string UE_uint16Property::GetTypeStr() const
+{
+	return "uint16 " + GetName() + " ";
+}
+//-----------------------------------------------
+UEClass UE_uint16Property::StaticClass()
+{
+	return UEObjectStore::FindClass("Class CoreUObject.UInt16Property");
+}
+//-----------------------------------------------------------------------------------------------
+std::string UE_uint32Property::GetTypeStr() const
+{
+	return "uint32 " + GetName() + " ";
+}
+//-----------------------------------------------
+UEClass UE_uint32Property::StaticClass()
+{
+	return UEObjectStore::FindClass("Class CoreUObject.UInt32Property");
+}
+//-----------------------------------------------------------------------------------------------
+std::string UE_uint64Property::GetTypeStr() const
+{
+	return "uint64 " + GetName() + " ";
+}
+//-----------------------------------------------
+UEClass UE_uint64Property::StaticClass()
+{
+	return UEObjectStore::FindClass("Class CoreUObject.UInt64Property");
+}
+//-----------------------------------------------------------------------------------------------
+std::string UE_int8Property::GetTypeStr() const
+{
+	return "int8 " + GetName() + " ";
+}
+//-----------------------------------------------
+UEClass UE_int8Property::StaticClass()
+{
+	return UEObjectStore::FindClass("Class CoreUObject.Int8Property");
+}
+//-----------------------------------------------------------------------------------------------
+std::string UE_int16Property::GetTypeStr() const
+{
+	return "int16 " + GetName() + " ";
+}
+//-----------------------------------------------
+UEClass UE_int16Property::StaticClass()
+{
+	return UEObjectStore::FindClass("Class CoreUObject.Int16Property");
+}
+//-----------------------------------------------------------------------------------------------
+std::string UE_intProperty::GetTypeStr() const
+{
+	return "int32 " + GetName() + " ";
+}
+//-----------------------------------------------
+UEClass UE_intProperty::StaticClass()
+{
+	return UEObjectStore::FindClass("Class CoreUObject.IntProperty");
+}
+//-----------------------------------------------------------------------------------------------
+std::string UE_int64Property::GetTypeStr() const
+{
+	return "int64 " + GetName() + " ";
+}
+//-----------------------------------------------
+UEClass UE_int64Property::StaticClass()
+{
+	return UEObjectStore::FindClass("Class CoreUObject.Int64Property");
+}
+//-----------------------------------------------------------------------------------------------
+std::string UE_floatProperty::GetTypeStr() const
+{
+	return "float " + GetName() + " ";
+}
+//-----------------------------------------------
+UEClass UE_floatProperty::StaticClass()
+{
+	return UEObjectStore::FindClass("Class CoreUObject.FloatProperty");
+}
+//-----------------------------------------------------------------------------------------------
+std::string UE_doubleProperty::GetTypeStr() const
+{
+	return "double " + GetName() + " ";
+}
+//-----------------------------------------------
+UEClass UE_doubleProperty::StaticClass()
+{
+	return UEObjectStore::FindClass("Class CoreUObject.DoubleProperty");
+}
+//-----------------------------------------------------------------------------------------------
+

@@ -4,6 +4,14 @@
 #include "CoreFunctions.h"
 
 class UEClass;
+class UEObject;
+
+class UEActor : public UEObject
+{
+public:
+
+	static UEClass StaticClass();
+};
 
 class UEObject
 {
@@ -26,6 +34,7 @@ public:
 	int32 GetInernalIndex() const;
 	std::string GetName() const;
 	std::string GetFullName() const;
+	std::string GetPrefixedName() const;
 	UEObject GetOuter() const;
 	UEClass GetClass() const;
 
@@ -112,3 +121,115 @@ public:
 	static UEClass StaticClass();
 };
 
+class UE_ArrayProperty : public UEProperty
+{
+public:
+	std::string GetArrayType() const;
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_StructProperty : public UEProperty
+{
+public:
+	UEStruct GetInnerStruct() const;
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_ObjectProperty : public UEProperty
+{
+public:
+	UEClass GetObjPropertyClass() const;
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_NumericalProperty : public UEProperty
+{
+public:
+	static UEClass StaticClass(); 
+};
+
+class UE_byteProperty : public UE_NumericalProperty
+{
+public:
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_uint16Property : public UE_NumericalProperty
+{
+public:
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_uint32Property : public UE_NumericalProperty
+{
+public:
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_uint64Property : public UE_NumericalProperty
+{
+public:
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_int8Property : public UE_NumericalProperty
+{
+public:
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_int16Property : public UE_NumericalProperty
+{
+public:
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_intProperty : public UE_NumericalProperty
+{
+public:
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_int64Property : public UE_NumericalProperty
+{
+public:
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_floatProperty : public UE_NumericalProperty
+{
+public:
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_doubleProperty : public UE_NumericalProperty
+{
+public:
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};

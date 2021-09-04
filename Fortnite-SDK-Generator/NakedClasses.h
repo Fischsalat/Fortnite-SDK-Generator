@@ -193,13 +193,13 @@ public:
 class UStructProperty : public UProperty
 {
 public:
-
+	UScriptStruct* innrStruct;
 };
 
 class UObjectPropertyBase : public UProperty
 {
 public:
-
+	UClass* propertyClass;
 };
 
 class UObjectProperty : public UObjectPropertyBase
@@ -211,7 +211,7 @@ public:
 class UArrayProperty : public UProperty
 {
 public:
-
+	UStructProperty* innerProperty;
 };
 
 class UDelegateProperty : public UProperty
