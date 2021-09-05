@@ -16,6 +16,9 @@
     <Filter Include="Headerdateien\Engine">
       <UniqueIdentifier>{5bdb4586-917c-4450-8b1e-6425c27dd814}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headerdateien\Engine-Wrapper">
+      <UniqueIdentifier>{cfe2c600-2d72-4ff4-86c6-39eb142e7745}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -24,11 +27,14 @@
     <ClCompile Include="NakedClasses.cpp">
       <Filter>Headerdateien\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="ClassWrapper.cpp">
-      <Filter>Headerdateien\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="ObjectStore.cpp">
-      <Filter>Headerdateien\Engine</Filter>
+      <Filter>Headerdateien\Engine-Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="ClassWrapper.cpp">
+      <Filter>Headerdateien\Engine-Wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="Printer.cpp">
+      <Filter>Headerdateien</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -41,14 +47,20 @@
     <ClInclude Include="CoreFunctions.h">
       <Filter>Headerdateien\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="ClassWrapper.h">
-      <Filter>Headerdateien\Engine</Filter>
-    </ClInclude>
     <ClInclude Include="Flags.h">
       <Filter>Headerdateien\Engine</Filter>
     </ClInclude>
     <ClInclude Include="ObjectStore.h">
-      <Filter>Headerdateien\Engine</Filter>
+      <Filter>Headerdateien\Engine-Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="ClassWrapper.h">
+      <Filter>Headerdateien\Engine-Wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="Printer.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Settings.h">
+      <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

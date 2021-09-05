@@ -139,7 +139,7 @@ std::vector<std::string> UEEnum::GetAllNames() const
 	return returnVec;
 }
 //----------------------------------------
-std::string UEEnum::GetEnumType() const
+std::string UEEnum::GetEnumTypeAsStr() const
 {
 	std::string temp = static_cast<UEnum*>(object)->cppType.ToString();
 
@@ -254,7 +254,7 @@ std::string UE_ArrayProperty::GetArrayType() const
 //----------------------------------------
 std::string UE_ArrayProperty::GetTypeStr() const
 {
-	return "TArray<" + GetArrayType() + ">" + " ";
+	return "TArray<" + GetArrayType() + ">";
 }
 //-----------------------------------------------
 UEClass UE_ArrayProperty::StaticClass()
@@ -270,7 +270,7 @@ UEStruct UE_StructProperty::GetInnerStruct() const
 //----------------------------------------
 std::string UE_StructProperty::GetTypeStr() const
 {
-	return "struct " + GetInnerStruct().GetName() + " ";
+	return "struct " + GetInnerStruct().GetPrefixedName(); // this may cause wrong prefixed
 }
 //-----------------------------------------------
 UEClass UE_StructProperty::StaticClass()
@@ -286,12 +286,28 @@ UEClass UE_ObjectProperty::GetObjPropertyClass() const
 //----------------------------------------
 std::string UE_ObjectProperty::GetTypeStr() const
 {
-	return "class " + GetObjPropertyClass().GetName() + " ";
+	return "class " + GetObjPropertyClass().GetName() + "*";
 }
 //-----------------------------------------------
-UEClass UE_StructProperty::StaticClass()
+UEClass UE_ObjectProperty::StaticClass()
 {
 	return UEObjectStore::FindClass("Class CoreUObject.ObjectProperty");
+}
+// UE_ClassProperty
+//-----------------------------------------------------------------------------------------------
+UEClass UE_ClassProperty::GetMetaClass() const
+{
+	return UEClass(static_cast<UClassProperty*>(object)->metaClass);
+}
+//----------------------------------------
+std::string UE_ClassProperty::GetTypeStr() const
+{
+	return "class UClass*";
+}
+//-----------------------------------------------
+UEClass UE_ClassProperty::StaticClass()
+{
+	return UEObjectStore::FindClass("Class CoreUObject.ClassProperty");
 }
 // UE_NumericalProperty
 //-----------------------------------------------------------------------------------------------
@@ -301,9 +317,17 @@ UEClass UE_NumericalProperty::StaticClass()
 }
 // UE_NumericalProperties
 //-----------------------------------------------------------------------------------------------
+UEEnum UE_byteProperty::GetEnum() const
+{
+	return UEEnum(static_cast<UByteProperty*>(object)->enm);
+}
+//----------------------------------------
 std::string UE_byteProperty::GetTypeStr() const
 {
-	return "uint16 " + GetName() + " ";
+	if (GetEnum().IsVaild())
+		return GetEnum().GetEnumTypeAsStr();
+	else
+		return "int8";
 }
 //-----------------------------------------------
 UEClass UE_byteProperty::StaticClass()
@@ -313,7 +337,7 @@ UEClass UE_byteProperty::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_uint16Property::GetTypeStr() const
 {
-	return "uint16 " + GetName() + " ";
+	return "uint16";
 }
 //-----------------------------------------------
 UEClass UE_uint16Property::StaticClass()
@@ -323,7 +347,7 @@ UEClass UE_uint16Property::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_uint32Property::GetTypeStr() const
 {
-	return "uint32 " + GetName() + " ";
+	return "uint32";
 }
 //-----------------------------------------------
 UEClass UE_uint32Property::StaticClass()
@@ -333,7 +357,7 @@ UEClass UE_uint32Property::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_uint64Property::GetTypeStr() const
 {
-	return "uint64 " + GetName() + " ";
+	return "uint64";
 }
 //-----------------------------------------------
 UEClass UE_uint64Property::StaticClass()
@@ -343,7 +367,7 @@ UEClass UE_uint64Property::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_int8Property::GetTypeStr() const
 {
-	return "int8 " + GetName() + " ";
+	return "int8";
 }
 //-----------------------------------------------
 UEClass UE_int8Property::StaticClass()
@@ -353,7 +377,7 @@ UEClass UE_int8Property::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_int16Property::GetTypeStr() const
 {
-	return "int16 " + GetName() + " ";
+	return "int16";
 }
 //-----------------------------------------------
 UEClass UE_int16Property::StaticClass()
@@ -363,7 +387,7 @@ UEClass UE_int16Property::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_intProperty::GetTypeStr() const
 {
-	return "int32 " + GetName() + " ";
+	return "int32";
 }
 //-----------------------------------------------
 UEClass UE_intProperty::StaticClass()
@@ -373,7 +397,7 @@ UEClass UE_intProperty::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_int64Property::GetTypeStr() const
 {
-	return "int64 " + GetName() + " ";
+	return "int64";
 }
 //-----------------------------------------------
 UEClass UE_int64Property::StaticClass()
@@ -383,7 +407,7 @@ UEClass UE_int64Property::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_floatProperty::GetTypeStr() const
 {
-	return "float " + GetName() + " ";
+	return "float";
 }
 //-----------------------------------------------
 UEClass UE_floatProperty::StaticClass()
@@ -393,7 +417,7 @@ UEClass UE_floatProperty::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_doubleProperty::GetTypeStr() const
 {
-	return "double " + GetName() + " ";
+	return "double";
 }
 //-----------------------------------------------
 UEClass UE_doubleProperty::StaticClass()

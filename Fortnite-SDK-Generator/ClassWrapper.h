@@ -66,7 +66,7 @@ public:
 	const UEnum::ECppForm GetCppForm() const;
 	std::string GetSingleName(int32 index) const;
 	std::vector<std::string> GetAllNames() const;
-	std::string GetEnumType() const;
+	std::string GetEnumTypeAsStr() const;
 
 	static UEClass StaticClass();
 };
@@ -124,6 +124,8 @@ public:
 class UE_ArrayProperty : public UEProperty
 {
 public:
+	using UEProperty::UEProperty;
+
 	std::string GetArrayType() const;
 	std::string GetTypeStr() const;
 
@@ -133,6 +135,8 @@ public:
 class UE_StructProperty : public UEProperty
 {
 public:
+	using UEProperty::UEProperty;
+
 	UEStruct GetInnerStruct() const;
 	std::string GetTypeStr() const;
 
@@ -142,7 +146,20 @@ public:
 class UE_ObjectProperty : public UEProperty
 {
 public:
+	using UEProperty::UEProperty;
+
 	UEClass GetObjPropertyClass() const;
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_ClassProperty : public UE_ObjectProperty
+{
+public:
+	using UE_ObjectProperty::UE_ObjectProperty;
+
+	UEClass GetMetaClass() const;
 	std::string GetTypeStr() const;
 
 	static UEClass StaticClass();
@@ -151,12 +168,17 @@ public:
 class UE_NumericalProperty : public UEProperty
 {
 public:
+	using UEProperty::UEProperty;
+
 	static UEClass StaticClass(); 
 };
 
 class UE_byteProperty : public UE_NumericalProperty
 {
 public:
+	using UE_NumericalProperty::UE_NumericalProperty;
+
+	UEEnum GetEnum() const;
 	std::string GetTypeStr() const;
 
 	static UEClass StaticClass();
@@ -165,6 +187,8 @@ public:
 class UE_uint16Property : public UE_NumericalProperty
 {
 public:
+	using UE_NumericalProperty::UE_NumericalProperty;
+
 	std::string GetTypeStr() const;
 
 	static UEClass StaticClass();
@@ -173,6 +197,8 @@ public:
 class UE_uint32Property : public UE_NumericalProperty
 {
 public:
+	using UE_NumericalProperty::UE_NumericalProperty;
+
 	std::string GetTypeStr() const;
 
 	static UEClass StaticClass();
@@ -181,6 +207,8 @@ public:
 class UE_uint64Property : public UE_NumericalProperty
 {
 public:
+	using UE_NumericalProperty::UE_NumericalProperty;
+
 	std::string GetTypeStr() const;
 
 	static UEClass StaticClass();
@@ -189,6 +217,8 @@ public:
 class UE_int8Property : public UE_NumericalProperty
 {
 public:
+	using UE_NumericalProperty::UE_NumericalProperty;
+
 	std::string GetTypeStr() const;
 
 	static UEClass StaticClass();
@@ -197,6 +227,8 @@ public:
 class UE_int16Property : public UE_NumericalProperty
 {
 public:
+	using UE_NumericalProperty::UE_NumericalProperty;
+
 	std::string GetTypeStr() const;
 
 	static UEClass StaticClass();
@@ -205,6 +237,8 @@ public:
 class UE_intProperty : public UE_NumericalProperty
 {
 public:
+	using UE_NumericalProperty::UE_NumericalProperty;
+
 	std::string GetTypeStr() const;
 
 	static UEClass StaticClass();
@@ -213,6 +247,8 @@ public:
 class UE_int64Property : public UE_NumericalProperty
 {
 public:
+	using UE_NumericalProperty::UE_NumericalProperty;
+
 	std::string GetTypeStr() const;
 
 	static UEClass StaticClass();
@@ -221,6 +257,8 @@ public:
 class UE_floatProperty : public UE_NumericalProperty
 {
 public:
+	using UE_NumericalProperty::UE_NumericalProperty;
+
 	std::string GetTypeStr() const;
 
 	static UEClass StaticClass();
@@ -229,6 +267,8 @@ public:
 class UE_doubleProperty : public UE_NumericalProperty
 {
 public:
+	using UE_NumericalProperty::UE_NumericalProperty;
+
 	std::string GetTypeStr() const;
 
 	static UEClass StaticClass();

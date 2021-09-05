@@ -21,6 +21,7 @@ public:
 	{
 		return index >= 0 && index < numElements;
 	}
+
 	inline T& operator[](int32 index)
 	{
 		return data[index];
@@ -30,6 +31,14 @@ public:
 class FString : public TArray<wchar_t>
 {
 public:
+	inline FString() = default;
+
+	inline FString(const wchar_t* wcha)
+	{
+		maxElements = numElements = *wcha ? wcslen(wcha) + 1 : 0;
+		numElements ? data = const_cast<wchar_t*>(wcha) : nullptr;
+	}
+
 	inline std::string ToString()
 	{
 		std::wstring wStr(data);
@@ -38,6 +47,11 @@ public:
 	inline std::wstring ToWString()
 	{
 		return std::wstring(data);
+	}
+
+	inline FString operator=(const wchar_t*&& other)
+	{
+		return FString(other);
 	}
 };
 
@@ -208,6 +222,13 @@ public:
 
 };
 
+class UClassProperty : public UObjectProperty
+{
+public:
+	UClass* metaClass;
+	int8 pad_001[0x18];
+};
+
 class UArrayProperty : public UProperty
 {
 public:
@@ -259,6 +280,12 @@ class UNumericProperty : public UProperty
 {
 public:
 
+};
+
+class UByteProperty : public UNumericProperty
+{
+public:
+	UEnum* enm;
 };
 
 
