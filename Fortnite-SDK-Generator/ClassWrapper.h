@@ -4,14 +4,7 @@
 #include "CoreFunctions.h"
 
 class UEClass;
-class UEObject;
 
-class UEActor : public UEObject
-{
-public:
-
-	static UEClass StaticClass();
-};
 
 class UEObject
 {
@@ -29,7 +22,7 @@ public:
 	bool operator==(UEObject other) const;
 	bool operator!=(UEObject other) const;
 
-	bool IsVaild() const;
+	bool IsValid() const;
 	int32 GetFlags() const;
 	int32 GetInernalIndex() const;
 	std::string GetName() const;
@@ -270,6 +263,14 @@ public:
 	using UE_NumericalProperty::UE_NumericalProperty;
 
 	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+
+class UEActor : public UEObject
+{
+public:
 
 	static UEClass StaticClass();
 };

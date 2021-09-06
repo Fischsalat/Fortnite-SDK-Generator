@@ -36,7 +36,7 @@ public:
 	inline FString(const wchar_t* wcha)
 	{
 		maxElements = numElements = *wcha ? wcslen(wcha) + 1 : 0;
-		numElements ? data = const_cast<wchar_t*>(wcha) : nullptr;
+		numElements ? data = const_cast<wchar_t*>(wcha) : data = nullptr;
 	}
 
 	inline std::string ToString()

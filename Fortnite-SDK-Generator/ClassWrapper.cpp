@@ -2,12 +2,7 @@
 #include "ClassWrapper.h"
 #include "ObjectStore.h"
 
-//UEActor
-//-----------------------------------------------------------------------------------------------
-UEClass UEActor::StaticClass()
-{
-	return UEObjectStore::FindClass("Class Engine.Actor");
-}
+
 //UEObject
 //-----------------------------------------------------------------------------------------------
 bool UEObject::operator==(UEObject other) const
@@ -20,7 +15,7 @@ bool UEObject::operator!=(UEObject other) const
 	return object != other.object;
 }
 //----------------------------------------
-bool UEObject::IsVaild() const
+bool UEObject::IsValid() const
 {
 	return object != nullptr;
 }
@@ -72,9 +67,9 @@ UEClass UEObject::GetClass() const
 template<typename T>
 bool UEObject::IsA() const
 {
-	if (this->GetClass().IsVaild())
+	if (this->GetClass().IsValid())
 	{
-		for (UEClass clss = this->GetClass(); clss.IsVaild(); clss = clss.GetSuper().Cast<UEClass>())
+		for (UEClass clss = this->GetClass(); clss.IsValid(); clss = clss.GetSuper().Cast<UEClass>())
 		{
 			if (clss == T::StaticClass())
 				return true;
@@ -83,10 +78,10 @@ bool UEObject::IsA() const
 	}
 }
 //----------------------------------------
-template<typename T>
-T UEObject::Cast() const
+template<typename UE_Type>
+UE_Type UEObject::Cast() const
 {
-	return reinterpret_cast<T>(this);
+	return UE_Type(object);
 }
 //-----------------------------------------------
 UEClass UEObject::StaticClass()
@@ -324,7 +319,7 @@ UEEnum UE_byteProperty::GetEnum() const
 //----------------------------------------
 std::string UE_byteProperty::GetTypeStr() const
 {
-	if (GetEnum().IsVaild())
+	if (GetEnum().IsValid())
 		return GetEnum().GetEnumTypeAsStr();
 	else
 		return "int8";
@@ -426,3 +421,10 @@ UEClass UE_doubleProperty::StaticClass()
 }
 //-----------------------------------------------------------------------------------------------
 
+
+//UEActor
+//-----------------------------------------------------------------------------------------------
+UEClass UEActor::StaticClass()
+{
+	return UEObjectStore::FindClass("Class Engine.Actor");
+}

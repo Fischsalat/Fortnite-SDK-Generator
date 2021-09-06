@@ -36,6 +36,9 @@
     <ClCompile Include="Printer.cpp">
       <Filter>Headerdateien</Filter>
     </ClCompile>
+    <ClCompile Include="Generator.cpp">
+      <Filter>Headerdateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Global.h">
@@ -60,6 +63,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="Settings.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Generator.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

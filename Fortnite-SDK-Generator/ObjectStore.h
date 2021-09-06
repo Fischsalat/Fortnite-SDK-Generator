@@ -1,10 +1,10 @@
 #pragma once
 #include "ClassWrapper.h"
 
-class ObjectsIterator;
 
 class UEObjectStore
 {
+
 public:
 
 	static bool Initialize();
@@ -18,18 +18,35 @@ public:
 	
 	static UEClass FindClass(std::string className);
 
-	UObjectIterator Begin();
-	UObjectIterator End();
+	class UObjectIterator Begin();
+	class UObjectIterator End();
 
-	UObjectIterator Begin() const;
-	UObjectIterator End() const;
+	class UObjectIterator Begin() const;
+	class UObjectIterator End() const;
 };
 
 class UObjectIterator
 {
+	UEObjectStore objectsToIterate;
+	UEObject currentObject;
+	int32 currentIndex;
+
+public:
+
+	UObjectIterator(const UEObjectStore& storeToIt);
+	UObjectIterator(const UEObjectStore& storeToIt, int32 index);
+
+	UObjectIterator(const UObjectIterator& otherIt);
+	UObjectIterator(UObjectIterator&& otherIt);
 
 	UObjectIterator& operator=(UObjectIterator otherIt);
-	bool operator==(UObjectIterator otherIt);
-	bool operator!=(UObjectIterator otherIt);
+	bool operator==(UObjectIterator otherIt) const;
+	bool operator!=(UObjectIterator otherIt) const;
+
+	UEObject operator*() const;
+	UEObject operator->() const;
+
+	UObjectIterator& operator++();
+	UObjectIterator operator++(int32);
 
 };
