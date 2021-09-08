@@ -19,12 +19,15 @@
     <Filter Include="Headerdateien\Engine-Wrapper">
       <UniqueIdentifier>{cfe2c600-2d72-4ff4-86c6-39eb142e7745}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headerdateien\Generator">
+      <UniqueIdentifier>{bc2e68e1-b48a-4d1e-98f5-5558ced6d13c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="NakedClasses.cpp">
+    <ClCompile Include="CoreClasses.cpp">
       <Filter>Headerdateien\Engine</Filter>
     </ClCompile>
     <ClCompile Include="ObjectStore.cpp">
@@ -33,18 +36,18 @@
     <ClCompile Include="ClassWrapper.cpp">
       <Filter>Headerdateien\Engine-Wrapper</Filter>
     </ClCompile>
-    <ClCompile Include="Printer.cpp">
-      <Filter>Headerdateien</Filter>
+    <ClCompile Include="Package.cpp">
+      <Filter>Headerdateien\Generator</Filter>
     </ClCompile>
     <ClCompile Include="Generator.cpp">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headerdateien\Generator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Global.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="NakedClasses.h">
+    <ClInclude Include="CoreClasses.h">
       <Filter>Headerdateien\Engine</Filter>
     </ClInclude>
     <ClInclude Include="CoreFunctions.h">
@@ -59,14 +62,17 @@
     <ClInclude Include="ClassWrapper.h">
       <Filter>Headerdateien\Engine-Wrapper</Filter>
     </ClInclude>
-    <ClInclude Include="Printer.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="Settings.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="dbg.h">
+      <Filter>Quelldateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Package.h">
+      <Filter>Headerdateien\Generator</Filter>
+    </ClInclude>
     <ClInclude Include="Generator.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Headerdateien\Generator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

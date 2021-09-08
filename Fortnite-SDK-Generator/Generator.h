@@ -1,5 +1,5 @@
 #pragma once
-
+#include "ObjectStore.h"
 
 class Generator
 {

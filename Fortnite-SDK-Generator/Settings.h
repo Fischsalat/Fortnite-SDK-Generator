@@ -4,25 +4,29 @@
 
 namespace Settings
 {
-	/// <summary>
-	/// The folder to put the generated SDK in
-	/// </summary>
-	std::string path = "C:\\SDKGen";
+	
+	std::string GetPath()
+	{
+		return "C:\\SDKGen";
+	}
+	
+	bool ShouldUseNamespaceForSDK()
+	{
+		return true;
+	}
 
-	/// <summary>
-	/// If the SDK should be in a namespace [Default: true]
-	/// </summary>
-	bool bUseNamespaceForSDK = true;
-
-	std::string namespaceForSDK = "";
-
-	/// <summary>
-	/// If parameter files should have their own sub-namespace [Default: true]
-	/// </summary>
-	bool bMakeNamespaceForParams = true;
-
-	/// <summary>
-	/// The sub-namespace for parameters (only relevant if bMakeNamespaceForParams = true) [Default: param]
-	/// </summary>
-	std::string paramNamespaceName = "param";
+	std::string GetSDKNamespace()
+	{
+		return "SDK";
+	}
+	
+	bool ShouldUseNamespaceForParams()
+	{
+		return true;
+	}
+	
+	std::string GetParamNamespace()
+	{
+		return "param";
+	}
 };

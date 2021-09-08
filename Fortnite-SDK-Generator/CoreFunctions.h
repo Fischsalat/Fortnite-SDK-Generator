@@ -1,5 +1,4 @@
 #pragma once
-#include "NakedClasses.h"
 #include "Global.h"
 
 

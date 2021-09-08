@@ -1,11 +1,11 @@
 #pragma once
-#include "NakedClasses.h"
+#include "CoreClasses.h"
 
 
-typedef void(__fastcall* tToString)(const class FName*, FString*);
+typedef void(__fastcall* tToString)(const class FName*, FString&);
 tToString fToString = reinterpret_cast<tToString>(reinterpret_cast<uintptr_t>(GetModuleHandle(0)) + Offset::FNameToString);
 
-typedef void(__thiscall* tGetFullName)(const class UObject*, FString*, UObject*);
+typedef void(__thiscall* tGetFullName)(const class UObject*, FString&, UObject*);
 tGetFullName fGetFullName = reinterpret_cast<tGetFullName>(reinterpret_cast<uintptr_t>(GetModuleHandle(0)) + Offset::GetFullName);
 
 std::string FName::ToString() const
@@ -14,7 +14,7 @@ std::string FName::ToString() const
 		return "";
 
 	FString outStr;
-	fToString(this, &outStr);
+	fToString(this, outStr);
 
 	std::string outName = outStr.ToString();
 
@@ -42,7 +42,7 @@ std::string UObject::GetFullName() const
 		return "";
 
 	FString outName;
-	fGetFullName(this, &outName, nullptr);
+	fGetFullName(this, outName, nullptr);
 
 	std::string name = outName.ToString();
 

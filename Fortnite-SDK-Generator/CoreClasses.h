@@ -17,6 +17,10 @@ public:
 	{
 		return numElements;
 	}
+	inline bool IsValid()
+	{
+		return data != nullptr;
+	}
 	inline bool IsValidIndex(int32 index)
 	{
 		return index >= 0 && index < numElements;
@@ -41,12 +45,19 @@ public:
 
 	inline std::string ToString()
 	{
-		std::wstring wStr(data);
-		return std::string(wStr.begin(), wStr.end());
+		if (IsValid())
+		{
+			std::wstring wStr(data);
+			return std::string(wStr.begin(), wStr.end());
+		}
+		return "";
 	}
 	inline std::wstring ToWString()
 	{
-		return std::wstring(data);
+		if(IsValid())
+			return std::wstring(data);
+
+		return L"";
 	}
 
 	inline FString operator=(const wchar_t*&& other)
@@ -106,6 +117,7 @@ public:
 	UObject* object;
 	int32 indexAndFlags;
 	int32 serialNumber;
+	int8 paddingTEST[0x8];
 };
 
 class TUObjectArray
@@ -266,20 +278,28 @@ public:
 class USetProperty : public UProperty
 {
 public:
-
+	UProperty* elementProp; 
+	int32 elementOffset;
+	int32 hashNextIdOffset;
+	int32 hashIndexOffset;
+	int32 setSize;
+	int32 elementOffset;
+	int32 alignment;
+	int32 anotherSetSize;
+	int32 padInt32;
 };
-
-class UEnumProperty : public UProperty
-{
-public:
-
-};
-
 
 class UNumericProperty : public UProperty
 {
 public:
 
+}; 
+
+class UEnumProperty : public UProperty
+{
+public:
+	UNumericProperty* underlayingType;
+	UEnum* propEnum;
 };
 
 class UByteProperty : public UNumericProperty

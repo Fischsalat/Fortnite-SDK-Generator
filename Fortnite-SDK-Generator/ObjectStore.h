@@ -18,11 +18,11 @@ public:
 	
 	static UEClass FindClass(std::string className);
 
-	class UObjectIterator Begin();
-	class UObjectIterator End();
+	class UObjectIterator begin();
+	class UObjectIterator begin() const;
 
-	class UObjectIterator Begin() const;
-	class UObjectIterator End() const;
+	class UObjectIterator end();
+	class UObjectIterator end() const;
 };
 
 class UObjectIterator

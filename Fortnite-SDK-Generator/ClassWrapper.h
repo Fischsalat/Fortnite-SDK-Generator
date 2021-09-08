@@ -1,14 +1,15 @@
 #pragma once
 #include "Global.h"
-#include "NakedClasses.h"
+#include "CoreClasses.h"
 #include "CoreFunctions.h"
 
+class UEField;
 class UEClass;
-
 
 class UEObject
 {
 protected:
+public:	
 	UObject* object;
 
 public:
@@ -30,6 +31,7 @@ public:
 	std::string GetPrefixedName() const;
 	UEObject GetOuter() const;
 	UEClass GetClass() const;
+	UEObject GetPackage() const;
 
 	template<typename T>
 	bool IsA() const;
@@ -112,6 +114,8 @@ public:
 	UEProperty GetNextProperty() const;
 
 	static UEClass StaticClass();
+
+	std::pair<enum class PropertyType, std::string> GetPropertyType() const;
 };
 
 class UE_ArrayProperty : public UEProperty
@@ -119,7 +123,7 @@ class UE_ArrayProperty : public UEProperty
 public:
 	using UEProperty::UEProperty;
 
-	std::string GetArrayType() const;
+	UEProperty GetInnerProperty() const;
 	std::string GetTypeStr() const;
 
 	static UEClass StaticClass();
@@ -153,6 +157,51 @@ public:
 	using UE_ObjectProperty::UE_ObjectProperty;
 
 	UEClass GetMetaClass() const;
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_boolProperty : public UEProperty
+{
+public:
+	using UEProperty::UEProperty;
+
+	int8 GetFieldSize() const;
+	int8 GetByteOffset() const;
+	int8 GetByteMask() const;
+	int8 GetFieldMask() const;
+	bool IsNormalBool() const;
+	bool IsBitField() const;
+
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_EnumProperty : public UEProperty
+{
+public:
+	using UEProperty::UEProperty;
+
+	UE_EnumProperty GetUnerlyingType() const;
+	UEEnum GetEnum() const;
+
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_SetProperty : public UEProperty
+{
+public:
+	using UEProperty::UEProperty;
+
+	UEProperty GetElementProperty() const;
+	int32 GetElementOffset() const;
+	int32 GetSize() const;
+	int32 GetAlignmet() const;
+
 	std::string GetTypeStr() const;
 
 	static UEClass StaticClass();
@@ -274,3 +323,79 @@ public:
 
 	static UEClass StaticClass();
 };
+
+enum class PropertyType //control c control v from guitrrs dumper
+{
+	Unknown,
+	StructProperty,
+	ObjectProperty,
+	SoftObjectProperty,
+	FloatProperty,
+	ByteProperty,
+	BoolProperty,
+	IntProperty,
+	Int8Property,
+	Int16Property,
+	Int64Property,
+	UInt16Property,
+	UInt32Property,
+	UInt64Property,
+	NameProperty,
+	DelegateProperty,
+	SetProperty,
+	ArrayProperty,
+	WeakObjectProperty,
+	StrProperty,
+	TextProperty,
+	MulticastSparseDelegateProperty,
+	EnumProperty,
+	DoubleProperty,
+	MulticastDelegateProperty,
+	ClassProperty,
+	MulticastInlineDelegateProperty,
+	MapProperty,
+	InterfaceProperty,
+	FieldPathProperty,
+	SoftClassProperty
+};
+
+/*
+class UObjectBase;										|
+class UObjectBaseUtility;								|
+class	UObject;										|
+class		UField;										|
+class			UEnum;									|
+class			UProperty;								|
+class				UByteProperty;						|
+class				UUInt16Property;					|
+class				UUInt32Property;					|
+class				UUInt64Property;					|
+class				UInt8Property;						|
+class				UInt16Property;						|
+class				UIntProperty;						|
+class				UInt64Property;						|
+class				UBoolProperty;
+class				UFloatProperty;						|
+class				UDoubleProperty;					|
+class				UObjectPropertyBase;				|
+class				UObjectProperty;					|
+class					UClassProperty;					|
+class					UInterfaceProperty;
+class					UWeakObjectProperty;
+class					ULazyObjectProperty;
+class					UAssetObjectProperty;
+class				UNameProperty;
+class				UStructProperty;					|
+class				UStrProperty;
+class				UTextProperty;
+class				UArrayProperty;						|
+class				UDelegateProperty;
+class				UMulticastDelegateProperty;
+class				UMapProperty;
+class				USetProperty;
+class				UEnumProperty;						|
+class			UStruct;								|
+class				UFunction;							|
+class				UClass;								|
+class				UScriptStruct;						|
+*/

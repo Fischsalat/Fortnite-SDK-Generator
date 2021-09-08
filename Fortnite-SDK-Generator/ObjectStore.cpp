@@ -53,22 +53,22 @@ UEClass UEObjectStore::FindClass(std::string className)
 	return UEObjectStore::FindObject<UEClass>(className);
 }
 
-UObjectIterator UEObjectStore::Begin()
+UObjectIterator UEObjectStore::begin()
 {
 	return UObjectIterator(*this, 0);
 }
 
-UObjectIterator UEObjectStore::Begin() const
+UObjectIterator UEObjectStore::begin() const
 {
 	return UObjectIterator(*this, 0);
 }
 
-UObjectIterator UEObjectStore::End()
+UObjectIterator UEObjectStore::end()
 {
 	return UObjectIterator(*this);
 }
 
-UObjectIterator UEObjectStore::End() const
+UObjectIterator UEObjectStore::end() const
 {
 	return UObjectIterator(*this);
 }

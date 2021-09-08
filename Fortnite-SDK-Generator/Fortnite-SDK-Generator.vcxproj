@@ -149,20 +149,21 @@
   <ItemGroup>
     <ClCompile Include="ClassWrapper.cpp" />
     <ClCompile Include="Generator.cpp" />
-    <ClCompile Include="NakedClasses.cpp" />
+    <ClCompile Include="CoreClasses.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ObjectStore.cpp" />
-    <ClCompile Include="Printer.cpp" />
+    <ClCompile Include="Package.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassWrapper.h" />
     <ClInclude Include="CoreFunctions.h" />
+    <ClInclude Include="dbg.h" />
     <ClInclude Include="Flags.h" />
     <ClInclude Include="Generator.h" />
     <ClInclude Include="Global.h" />
-    <ClInclude Include="NakedClasses.h" />
+    <ClInclude Include="CoreClasses.h" />
     <ClInclude Include="ObjectStore.h" />
-    <ClInclude Include="Printer.h" />
+    <ClInclude Include="Package.h" />
     <ClInclude Include="Settings.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
