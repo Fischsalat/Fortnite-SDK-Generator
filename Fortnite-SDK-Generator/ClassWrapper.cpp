@@ -330,6 +330,42 @@ UEClass UE_ClassProperty::StaticClass()
 	static UEClass staticClass = UEObjectStore::FindClass("Class CoreUObject.ClassProperty");
 	return staticClass;
 }
+// UE_TextProperty
+//-----------------------------------------------------------------------------------------------
+std::string UE_TextProperty::GetTypeStr() const
+{
+	return "class FText";
+}
+//-----------------------------------------------
+UEClass UE_TextProperty::StaticClass()
+{
+	static UEClass staticClass = UEObjectStore::FindClass("Class CoreUObject.TextProperty");
+	return staticClass;
+}
+// UE_StringProperty
+//-----------------------------------------------------------------------------------------------
+std::string UE_StrProperty::GetTypeStr() const
+{
+	return "class FString";
+}
+//-----------------------------------------------
+UEClass UE_StrProperty::StaticClass()
+{
+	static UEClass staticClass = UEObjectStore::FindClass("Class CoreUObject.StrProperty");
+	return staticClass;
+}
+// UE_NameProperty
+//-----------------------------------------------------------------------------------------------
+std::string UE_NameProperty::GetTypeStr() const
+{
+	return "class FName";
+}
+//-----------------------------------------------
+UEClass UE_NameProperty::StaticClass()
+{
+	static UEClass staticClass = UEObjectStore::FindClass("Class CoreUObject.NameProperty");
+	return staticClass;
+}
 // UE_EnumProperty
 //-----------------------------------------------------------------------------------------------
 UE_EnumProperty UE_EnumProperty::GetUnerlyingType() const
@@ -382,6 +418,53 @@ std::string UE_SetProperty::GetTypeStr() const
 UEClass UE_SetProperty::StaticClass()
 {
 	static UEClass staticClass = UEObjectStore::FindClass("Class CoreUObject.SetProperty");
+	return staticClass;
+}
+// UE_MapProperty
+//-----------------------------------------------------------------------------------------------
+UEProperty UE_MapProperty::GetKeyProperty() const
+{
+	return static_cast<UMapProperty*>(object)->keyProp;
+}
+//----------------------------------------
+UEProperty UE_MapProperty::GetValueProperty() const
+{
+	return static_cast<UMapProperty*>(object)->valueProp;
+}
+//----------------------------------------
+int32 UE_MapProperty::GetKeyOffset() const
+{
+	return static_cast<UMapProperty*>(object)->keyOffset;
+}
+//----------------------------------------
+int32 UE_MapProperty::GetValueOffset() const
+{
+	return static_cast<UMapProperty*>(object)->valueOffset;
+}
+//----------------------------------------
+int32 UE_MapProperty::GetElementOffset() const
+{
+	return static_cast<UMapProperty*>(object)->elementOffset;
+}
+//----------------------------------------
+int32 UE_MapProperty::GetMapSize() const
+{
+	return static_cast<UMapProperty*>(object)->mapSize;
+}
+//----------------------------------------
+int32 UE_MapProperty::GetAlignmet() const
+{
+	return static_cast<UMapProperty*>(object)->alignment;
+}
+//----------------------------------------
+std::string UE_MapProperty::GetTypeStr() const
+{
+	return "TSet<" + GetKeyProperty().GetPropertyType().second + "," + GetValueProperty().GetPropertyType().second + ">";
+}
+//-----------------------------------------------
+UEClass UE_MapProperty::StaticClass()
+{
+	static UEClass staticClass = UEObjectStore::FindClass("Class CoreUObject.MapProperty");
 	return staticClass;
 }
 // UE_BoolProperty

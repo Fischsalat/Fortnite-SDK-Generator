@@ -74,6 +74,20 @@ public:
 	Key key;
 };
 
+template<typename ElementType>
+class TSet
+{
+public:
+
+};
+
+template<typename Value, typename Key>
+class TMap
+{
+public:
+
+};
+
 class FName
 {
 public:
@@ -272,8 +286,20 @@ public:
 class UMapProperty : public UProperty
 {
 public:
-
+	class UProperty* keyProp;
+	class UProperty* valueProp;
+	int32 keyOffset;
+	int32 valueOffset;
+	int32 elementOffset;
+	int32 hashNextIdOffset;
+	int32 hashIndexOffset;
+	int32 mapSize;
+	int32 moreElementOffset;
+	int32 alignment;
+	int32 moreMapSize;
+	int8 mapPad[0x14];
 };
+
 
 class USetProperty : public UProperty
 {
@@ -283,7 +309,7 @@ public:
 	int32 hashNextIdOffset;
 	int32 hashIndexOffset;
 	int32 setSize;
-	int32 elementOffset;
+	int32 MoreElementOffset;
 	int32 alignment;
 	int32 anotherSetSize;
 	int32 padInt32;
@@ -307,5 +333,3 @@ class UByteProperty : public UNumericProperty
 public:
 	UEnum* enm;
 };
-
-

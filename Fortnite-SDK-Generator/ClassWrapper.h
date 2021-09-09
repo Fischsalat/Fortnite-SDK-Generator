@@ -162,6 +162,36 @@ public:
 	static UEClass StaticClass();
 };
 
+class UE_TextProperty : public UEProperty
+{
+public:
+	using UEProperty::UEProperty;
+
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_StrProperty : public UEProperty
+{
+public:
+	using UEProperty::UEProperty;
+
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_NameProperty : public UEProperty
+{
+public:
+	using UEProperty::UEProperty;
+
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
 class UE_boolProperty : public UEProperty
 {
 public:
@@ -200,6 +230,24 @@ public:
 	UEProperty GetElementProperty() const;
 	int32 GetElementOffset() const;
 	int32 GetSize() const;
+	int32 GetAlignmet() const;
+
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_MapProperty : public UEProperty
+{
+public:
+	using UEProperty::UEProperty;
+
+	UEProperty GetKeyProperty() const;
+	UEProperty GetValueProperty() const;
+	int32 GetKeyOffset() const;
+	int32 GetValueOffset() const;
+	int32 GetElementOffset() const;
+	int32 GetMapSize() const;
 	int32 GetAlignmet() const;
 
 	std::string GetTypeStr() const;
