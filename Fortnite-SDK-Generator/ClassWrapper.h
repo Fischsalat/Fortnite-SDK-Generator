@@ -9,7 +9,6 @@ class UEClass;
 class UEObject
 {
 protected:
-public:	
 	UObject* object;
 
 public:
@@ -23,9 +22,14 @@ public:
 	bool operator==(UEObject other) const;
 	bool operator!=(UEObject other) const;
 
+	void operator=(UEObject other);
+
+	UObject* GetUObject() const;
+
 	bool IsValid() const;
 	int32 GetFlags() const;
 	int32 GetInernalIndex() const;
+	int32 GetComparisonIndex() const;
 	std::string GetName() const;
 	std::string GetFullName() const;
 	std::string GetPrefixedName() const;
@@ -33,11 +37,11 @@ public:
 	UEClass GetClass() const;
 	UEObject GetPackage() const;
 
-	template<typename T>
+	template<typename UE_Type>
 	bool IsA() const;
 	
-	template<typename T>
-	T Cast() const;
+	template<typename UE_Type>
+	UE_Type Cast() const;
 
 	static UEClass StaticClass();
 };
@@ -255,6 +259,37 @@ public:
 	static UEClass StaticClass();
 };
 
+class UE_WeakObjectProperty : public UE_ObjectProperty
+{
+public:
+	using UE_ObjectProperty::UE_ObjectProperty;
+
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_MulticastDelegateProperty : public UEProperty
+{
+public:
+	using UEProperty::UEProperty;
+
+	UEFunction GetSignatureFunction() const;
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
+class UE_InterfaceProperty : public UE_ObjectProperty
+{
+public:
+	using UE_ObjectProperty::UE_ObjectProperty;
+
+	std::string GetTypeStr() const;
+
+	static UEClass StaticClass();
+};
+
 class UE_NumericalProperty : public UEProperty
 {
 public:
@@ -428,19 +463,19 @@ class				UDoubleProperty;					|
 class				UObjectPropertyBase;				|
 class				UObjectProperty;					|
 class					UClassProperty;					|
-class					UInterfaceProperty;
-class					UWeakObjectProperty;
+class					UInterfaceProperty;				|
+class					UWeakObjectProperty;			|
 class					ULazyObjectProperty;
 class					UAssetObjectProperty;
 class				UNameProperty;
 class				UStructProperty;					|
-class				UStrProperty;
-class				UTextProperty;
+class				UStrProperty;						|
+class				UTextProperty;						|
 class				UArrayProperty;						|
 class				UDelegateProperty;
-class				UMulticastDelegateProperty;
-class				UMapProperty;
-class				USetProperty;
+class				UMulticastDelegateProperty;			|
+class				UMapProperty;						|
+class				USetProperty;						|
 class				UEnumProperty;						|
 class			UStruct;								|
 class				UFunction;							|

@@ -1,6 +1,7 @@
+// Copyright 1998-2021 Epic Games, Inc. All Rights Reserved.
+/* [For the flags and the general data types like UObject, TArray etc.] */
 #pragma once
 #include <inttypes.h>
-// just in case: copyright epic games, flags are stright up copied from the UE4 source
 
 
 enum EPropertyFlags : uint64

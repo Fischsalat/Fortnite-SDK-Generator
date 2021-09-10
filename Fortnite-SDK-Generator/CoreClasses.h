@@ -2,6 +2,8 @@
 #include "Global.h"
 #include "Flags.h"
 
+class UObject;
+
 template<class T>
 class TArray
 {
@@ -66,28 +68,6 @@ public:
 	}
 };
 
-template<typename Value, typename Key>
-class TPair
-{
-public:
-	Value value;
-	Key key;
-};
-
-template<typename ElementType>
-class TSet
-{
-public:
-
-};
-
-template<typename Value, typename Key>
-class TMap
-{
-public:
-
-};
-
 class FName
 {
 public:
@@ -106,6 +86,14 @@ public:
 	}
 };
 
+template<typename Value, typename Key>
+class TPair
+{
+public:
+	Value value;
+	Key key;
+};
+
 
 class UClass;
 class UProperty;
@@ -114,7 +102,7 @@ class UProperty;
 class UObject
 {
 public:
-	void** Vft;
+	void** vft;
 	int32 flags;
 	int32 internalIndex;
 	UClass* privateClass;
@@ -270,7 +258,7 @@ public:
 class UMulticastDelegateProperty : public UProperty
 {
 public:
-
+	UFunction* signatureFunction;
 };
 
 class UBoolProperty : public UProperty
@@ -314,7 +302,6 @@ public:
 	int32 anotherSetSize;
 	int32 padInt32;
 };
-
 class UNumericProperty : public UProperty
 {
 public:
@@ -332,4 +319,102 @@ class UByteProperty : public UNumericProperty
 {
 public:
 	UEnum* enm;
+};
+
+
+
+
+
+
+template<typename ElementType>
+class TSet
+{
+public:
+
+};
+
+template<typename Value, typename Key>
+class TMap
+{
+public:
+
+};
+
+template<typename ObjectType>
+class TWeakObjectPtr
+{
+	int32		objectIndex;
+	int32		objectSerialNumber;
+
+public:
+	inline bool operator==(TWeakObjectPtr other)
+	{
+		return objectIndex == other.objectIndex && objectSerialNumber == other.objectSerialNumber;
+	}
+	inline bool operator!=(TWeakObjectPtr other)
+	{
+		return objectIndex != other.objectIndex || objectSerialNumber != other.objectSerialNumber;
+	}
+	inline TWeakObjectPtr& operator=(TWeakObjectPtr other)
+	{
+		objectIndex = other.objectIndex;
+		objectSerialNumber = other.objectSerialNumber;
+	}
+
+	inline UObject* GetUObject() const
+	{
+		return GObjects->ByIndex(objectIndex);
+	}
+	inline ObjectType* GetObjectCastet() const
+	{
+		return static_cast<ObjectType*>(GObjects->ByIndex(objectIndex));
+	}
+
+	inline UObject* operator*()
+	{
+		return GetUObject();
+	}
+	inline UObject* operator->()
+	{
+		return GetUObject();
+	}
+};
+
+class FScriptInterface
+{
+	UObject* objectPointer;
+	void* interfacePointer;
+
+public:
+
+	inline UObject* GetObjPtr()
+	{
+		return objectPointer;
+	}
+};
+
+template<typename TObjectID>
+class TPersistentObjectPtr
+{
+	mutable TWeakObjectPtr<UObject> weakPtr;
+	mutable int32 tagAtLastTest;
+	TObjectID objectID;
+};
+
+class FUniqueObjectGuid
+{
+public:
+	int8 pad134[0x10];
+};
+
+class FLazyObjectPtr : public TPersistentObjectPtr<FUniqueObjectGuid>
+{
+public:
+
+};
+
+class FText
+{
+public:
+	int8 pad_99[0x18];
 };

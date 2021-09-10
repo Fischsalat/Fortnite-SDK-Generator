@@ -34,7 +34,7 @@ static std::string MakeValidCppName(std::string name)
 				|| name[i] == '{'
 				|| name[i] == '}')
 			{
-				name[i] == '_';
+				name[i] = '_';
 			}
 		}
 		return name;

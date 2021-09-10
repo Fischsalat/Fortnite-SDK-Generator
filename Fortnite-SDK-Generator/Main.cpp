@@ -1,3 +1,7 @@
+/*---------------------------------------------------------------------------------------------------*/
+/* Basically full credits to KN4CK3R and Guittr14, I used their versions of this generator as a base */
+/*---------------------------------------------------------------------------------------------------*/
+// + Epic for the UE4 stuff
 #pragma once
 #include "Global.h"
 #include "CoreFunctions.h"
@@ -18,6 +22,7 @@ bool IsAA(UEObject obj)
 		}
 		return false;
 	}
+	return false;
 }
 
 DWORD WINAPI Main(LPVOID lpParam)
@@ -31,16 +36,17 @@ DWORD WINAPI Main(LPVOID lpParam)
 
 	std::cout << "search" << std::endl;
 	
+
+	std::unordered_map<std::vector<int32>, int32> compIndexCach;
+
 	int32 count = 0;
 	for (auto obj : UEObjectStore())
 	{
-		if (IsAA<UE_ArrayProperty>(obj))
+		if (IsAA<UEClass>(obj))
 		{
-			if (obj.GetFullName().find("Default__") != NPOS)
-				continue;
-			std::cout << obj.GetFullName() << std::endl;
-			std::cout << UE_ArrayProperty(obj.object).GetTypeStr() << std::endl;
-			count++;
+			int32 classIndex = obj.GetComparisonIndex();
+
+			if(obj.sup)
 		}
 	} 
 	std::cout << count << std::endl;
@@ -69,3 +75,11 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 
 	return TRUE;
 }
+
+
+/*
+* Package:
+* std::unordered_map<std::vector<std::string>* classMemberNames, std::string className>;
+* 
+* or rather instead of name strings just the comparison index...
+*/

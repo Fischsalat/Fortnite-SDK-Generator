@@ -15,6 +15,16 @@ bool UEObject::operator!=(UEObject other) const
 	return object != other.object;
 }
 //----------------------------------------
+void UEObject::operator=(UEObject other)
+{
+	object = other.object;
+}
+//----------------------------------------
+UObject* UEObject::GetUObject() const
+{
+	return object;
+}
+//----------------------------------------
 bool UEObject::IsValid() const
 {
 	return object != nullptr;
@@ -28,6 +38,11 @@ int32 UEObject::GetFlags() const
 int32 UEObject::GetInernalIndex() const
 {
 	return object->internalIndex;
+}
+//----------------------------------------
+int32 UEObject::GetComparisonIndex() const
+{
+	return object->name.comparisonIndex;
 }
 //----------------------------------------
 std::string UEObject::GetName() const
@@ -91,6 +106,7 @@ bool UEObject::IsA() const
 		}
 		return false;
 	}
+	return false;
 }
 //----------------------------------------
 template<typename UE_Type>
@@ -467,6 +483,47 @@ UEClass UE_MapProperty::StaticClass()
 	static UEClass staticClass = UEObjectStore::FindClass("Class CoreUObject.MapProperty");
 	return staticClass;
 }
+// UE_MulticastDelegateProperty
+//-----------------------------------------------------------------------------------------------
+UEFunction UE_MulticastDelegateProperty::GetSignatureFunction() const
+{
+	return UEFunction(static_cast<UMulticastDelegateProperty*>(object)->signatureFunction);
+}
+//----------------------------------------
+std::string UE_MulticastDelegateProperty::GetTypeStr() const
+{
+	return "struct FScriptMulticastDelegate";
+}
+//-----------------------------------------------
+UEClass UE_MulticastDelegateProperty::StaticClass()
+{
+	static UEClass staticClass = UEObjectStore::FindClass("Class CoreUObject.MulticastDelegateProperty");
+	return staticClass;
+}
+// UE_WeakObjectProperty
+//-----------------------------------------------------------------------------------------------
+std::string UE_WeakObjectProperty::GetTypeStr() const
+{
+	return "struct TWeakObjectPtr<" + GetObjPropertyClass().GetName() + ">";
+}
+//-----------------------------------------------
+UEClass UE_WeakObjectProperty::StaticClass()
+{
+	static UEClass staticClass = UEObjectStore::FindClass("Class CoreUObject.WeakObjectProperty");
+	return staticClass;
+}
+// UE_InterfaceProperty
+//-----------------------------------------------------------------------------------------------
+std::string UE_InterfaceProperty::GetTypeStr() const
+{
+	return "struct FScriptInterface<" + GetObjPropertyClass().GetName() + ">";
+}
+//-----------------------------------------------
+UEClass UE_InterfaceProperty::StaticClass()
+{
+	static UEClass staticClass = UEObjectStore::FindClass("Class CoreUObject.InterfaceProperty");
+	return staticClass;
+}
 // UE_BoolProperty
 //-----------------------------------------------------------------------------------------------
 int8 UE_boolProperty::GetFieldSize() const
@@ -672,5 +729,6 @@ std::pair<PropertyType, std::string> UEProperty::GetPropertyType() const
 	if (IsA<UE_MulticastDelegateProperty>()) { return { PropertyType::MulticastDelegateProperty, Cast<UE_MulticastDelegateProperty>().GetTypeStr() }; };
 	if (IsA<UE_WeakObjectProperty>()) { return { PropertyType::WeakObjectProperty, Cast<UE_WeakObjectProperty>().GetTypeStr() }; };
 	if (IsA<UE_ObjectProperty>()) { return { PropertyType::ObjectProperty, Cast<UE_ObjectProperty>().GetTypeStr() }; };
+	if (IsA<UE_ObjectProperty>()) { return { PropertyType::Unknown, Cast<UEProperty>().GetName() }; };
 	return { PropertyType::Unknown, GetClass().GetName() };
 }
