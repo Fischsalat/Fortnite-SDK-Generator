@@ -25,6 +25,11 @@ bool IsAA(UEObject obj)
 	return false;
 }
 
+std::string GetWorld()
+{
+	return "World!";
+}
+
 DWORD WINAPI Main(LPVOID lpParam)
 {
 	AllocConsole();
@@ -37,31 +42,19 @@ DWORD WINAPI Main(LPVOID lpParam)
 	std::cout << "search" << std::endl;
 	
 
-	std::unordered_map<std::vector<int32>, int32> compIndexCach;
+	std::cout << std::format("Hello {}", GetWorld()) << std::endl;
 
-	int32 count = 0;
+	/*
+	int32 count = 0;+
 	for (auto obj : UEObjectStore())
 	{
 		if (IsAA<UEClass>(obj))
 		{
 			int32 classIndex = obj.GetComparisonIndex();
 
-			if(obj.sup)
 		}
 	} 
-	std::cout << count << std::endl;
 	std::cout << "nfi" << std::endl;
-
-	/*
-	UEObjectStore::Initialize();
-
-	std::ofstream stream("PrefixedNames.txt");
-
-	for (auto object : UEObjectStore())
-	{
-		stream << object.GetPrefixedName() << "\n";
-	}
-	std::cout << "done" << std::endl;
 	*/
 	return 0;
 }

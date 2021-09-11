@@ -29,4 +29,9 @@ namespace Settings
 	{
 		return "param";
 	}
+
+	bool ShouldUseStrings()
+	{
+		return true;
+	}
 };

@@ -30,6 +30,11 @@ bool UEObject::IsValid() const
 	return object != nullptr;
 }
 //----------------------------------------
+void* UEObject::GetAddress() const
+{
+	return object;
+}
+//----------------------------------------
 int32 UEObject::GetFlags() const
 {
 	return object->flags;
@@ -55,7 +60,7 @@ std::string UEObject::GetFullName() const
 	return object->GetFullName();
 }
 //----------------------------------------
-std::string UEObject::GetPrefixedName() const
+std::string UEObject::GetCppName() const
 {
 	std::string name;
 	
@@ -71,7 +76,7 @@ std::string UEObject::GetPrefixedName() const
 		name += 'F';
 	}
 
-	return name += GetName();
+	return MakeValidCppName(name += GetName());
 }
 //----------------------------------------
 UEObject UEObject::GetOuter() const
@@ -87,7 +92,7 @@ UEClass UEObject::GetClass() const
 UEObject UEObject::GetPackage() const
 {
 	UEObject packageObj;
-	for (UEObject obj = *this; obj.IsValid(); obj = obj.GetOuter())
+	for (UEObject obj = GetOuter(); obj.IsValid(); obj = obj.GetOuter())
 	{
 		packageObj = obj;
 	}
@@ -181,6 +186,16 @@ UEClass UEEnum::StaticClass()
 }
 //UESTruct
 //-----------------------------------------------------------------------------------------------
+std::string UEStruct::GetUniqueName() const
+{
+	std::string name;
+
+	if (UEObjectStore::CountObjects<UEStruct>(GetName()) > 1)
+		name += GetOuter().GetCppName();
+
+	return name += GetCppName();
+}
+//----------------------------------------
 UEStruct UEStruct::GetSuper() const
 {
 	return UEStruct(static_cast<UStruct*>(object)->super);
@@ -304,7 +319,7 @@ UEStruct UE_StructProperty::GetInnerStruct() const
 //----------------------------------------
 std::string UE_StructProperty::GetTypeStr() const
 {
-	return "struct " + GetInnerStruct().GetPrefixedName(); // this may cause wrong prefixed
+	return "struct " + GetInnerStruct().GetCppName(); // this may cause wrong prefixed
 }
 //-----------------------------------------------
 UEClass UE_StructProperty::StaticClass()
@@ -396,7 +411,7 @@ UEEnum UE_EnumProperty::GetEnum() const
 //----------------------------------------
 std::string UE_EnumProperty::GetTypeStr() const
 {
-	return GetEnum().GetEnumTypeAsStr();
+	return "enum class " + GetEnum().GetEnumTypeAsStr();
 }
 //-----------------------------------------------
 UEClass UE_EnumProperty::StaticClass()

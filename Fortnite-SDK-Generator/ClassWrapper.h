@@ -27,12 +27,13 @@ public:
 	UObject* GetUObject() const;
 
 	bool IsValid() const;
+	void* GetAddress() const;
 	int32 GetFlags() const;
 	int32 GetInernalIndex() const;
 	int32 GetComparisonIndex() const;
 	std::string GetName() const;
 	std::string GetFullName() const;
-	std::string GetPrefixedName() const;
+	std::string GetCppName() const;
 	UEObject GetOuter() const;
 	UEClass GetClass() const;
 	UEObject GetPackage() const;
@@ -75,6 +76,7 @@ class UEStruct : public UEField
 public:
 	using UEField::UEField;
 
+	std::string GetUniqueName() const;
 	UEStruct GetSuper() const;
 	UEField GetChildren() const;
 	int32 GetStructSize() const;
@@ -200,6 +202,14 @@ class UE_boolProperty : public UEProperty
 {
 public:
 	using UEProperty::UEProperty;
+
+	inline bool operator<(UE_boolProperty other) const
+	{
+		if (GetByteOffset() == other.GetByteOffset())
+			return GetByteMask() < other.GetByteMask();
+
+		return GetByteOffset() < other.GetByteOffset();
+	}
 
 	int8 GetFieldSize() const;
 	int8 GetByteOffset() const;

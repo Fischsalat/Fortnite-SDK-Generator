@@ -14,6 +14,9 @@ public:
 	int32 GetMaxNumObjects() const;
 
 	template<typename UE_Type>
+	static int32 CountObjects(std::string objectName);
+
+	template<typename UE_Type>
 	static UE_Type FindObject(std::string objectName);
 	
 	static UEClass FindClass(std::string className);

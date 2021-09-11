@@ -32,6 +32,21 @@ int32 UEObjectStore::GetMaxNumObjects() const
 }
 
 template<typename UE_Type>
+int32 UEObjectStore::CountObjects(std::string objectName)
+{
+	int32 count = 0; 
+	for (auto obj : UEObjectStore())
+	{
+		if (obj.IsA<UEStruct>())
+		{
+			if (obj.GetName() == objectName)
+				count++;
+		}
+	}
+	return count;
+}
+
+template<typename UE_Type>
 UE_Type UEObjectStore::FindObject(std::string objectName)
 {
 	for (int i = 0; i < GObjects->Num(); i++)
