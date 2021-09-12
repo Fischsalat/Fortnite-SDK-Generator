@@ -1,7 +1,6 @@
 #pragma once
 #include "Global.h"
 #include "ClassWrapper.h"
-#include "ObjectStore.h"
 
 bool CompareProperties(UEProperty left, UEProperty right);
 
@@ -60,6 +59,7 @@ private:
 	static std::vector<Struct> structs;
 	static std::vector<Class> classes;
 
+	//void Process(UEObject package, std::unordered_map<UEObject, bool>& processedObjects);
 
 	bool IsDependend(const UEObject& obj);
 
@@ -72,12 +72,12 @@ private:
 	void PrintStruct(const Struct& strct);
 	void PrintEnum(const Enum& enm);
 	void PrintFunction(const Function& func);
-	void PrintMembers();
+	void PrintMembers(const std::vector<UEProperty>& mem, std::vector<Member> outMembers);
 
 	void GenerateMembers(const std::vector<UEProperty>&, const UEStruct& super, std::vector<Member>& outMembers);
 	Function GenerateFunction(const UEFunction& function);
 	Struct GenerateScritStruct(const UEStruct& strct);
-	Class GenerateClass(const UEClass& clss);
+	//Class GenerateClass(const UEClass& clss);
 	Enum GenerateEnumClass(const UEEnum& enm);
 
 	Member GenerateBytePadding(int32 id, int32 offset, int32 padSize, std::string reason);

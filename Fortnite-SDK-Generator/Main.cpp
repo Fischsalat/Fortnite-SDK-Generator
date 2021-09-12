@@ -42,20 +42,18 @@ DWORD WINAPI Main(LPVOID lpParam)
 	std::cout << "search" << std::endl;
 	
 
+
 	std::cout << std::format("Hello {}", GetWorld()) << std::endl;
 
-	/*
-	int32 count = 0;+
+	std::ofstream streem("Properties_Enums.txt");
+
 	for (auto obj : UEObjectStore())
 	{
-		if (IsAA<UEClass>(obj))
-		{
-			int32 classIndex = obj.GetComparisonIndex();
+		if (obj.GetFullName() ==
+	}
 
-		}
-	} 
 	std::cout << "nfi" << std::endl;
-	*/
+	
 	return 0;
 }
 

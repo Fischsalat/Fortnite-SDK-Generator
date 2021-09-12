@@ -1,6 +1,6 @@
 #pragma once
 #include "ClassWrapper.h"
-
+#include "Global.h"
 
 class UEObjectStore
 {
@@ -13,8 +13,7 @@ public:
 	int32 GetNumObjects() const;
 	int32 GetMaxNumObjects() const;
 
-	template<typename UE_Type>
-	static int32 CountObjects(std::string objectName);
+	static int32 CountObjects(UEClass staticClass, std::string objectName);
 
 	template<typename UE_Type>
 	static UE_Type FindObject(std::string objectName);

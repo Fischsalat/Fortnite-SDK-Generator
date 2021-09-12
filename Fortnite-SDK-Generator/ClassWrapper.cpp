@@ -114,6 +114,20 @@ bool UEObject::IsA() const
 	return false;
 }
 //----------------------------------------
+bool UEObject::IsA(UEClass staticClass) const
+{
+	if (GetClass().IsValid())
+	{
+		for (UEClass clss = GetClass(); clss.IsValid(); clss = clss.GetSuper().Cast<UEClass>())
+		{
+			if (clss == staticClass)
+				return true;
+		}
+		return false;
+	}
+	return false;
+}
+//----------------------------------------
 template<typename UE_Type>
 UE_Type UEObject::Cast() const
 {
@@ -176,7 +190,7 @@ std::string UEEnum::GetEnumTypeAsStr() const
 {
 	std::string temp = GetName();
 
-	return temp[0] == 'E' ?  temp : "E" + temp;
+	return temp[0] == 'E' ?  "enum class " + temp : "enum class E" + temp;
 }
 //-----------------------------------------------
 UEClass UEEnum::StaticClass()
@@ -190,7 +204,7 @@ std::string UEStruct::GetUniqueName() const
 {
 	std::string name;
 
-	if (UEObjectStore::CountObjects<UEStruct>(GetName()) > 1)
+	if (UEObjectStore::CountObjects(UEStruct::StaticClass(), GetName()) > 1)
 		name += GetOuter().GetCppName();
 
 	return name += GetCppName();
@@ -302,7 +316,7 @@ UEProperty UE_ArrayProperty::GetInnerProperty() const
 //----------------------------------------
 std::string UE_ArrayProperty::GetTypeStr() const
 {
-	return "TArray<" + GetInnerProperty().GetPropertyType().second + ">";
+	return std::format("TArray<{}>", GetInnerProperty().GetPropertyType().second);
 }
 //-----------------------------------------------
 UEClass UE_ArrayProperty::StaticClass()
@@ -319,7 +333,7 @@ UEStruct UE_StructProperty::GetInnerStruct() const
 //----------------------------------------
 std::string UE_StructProperty::GetTypeStr() const
 {
-	return "struct " + GetInnerStruct().GetCppName(); // this may cause wrong prefixed
+	return std::format("struct {}", GetInnerStruct().GetCppName()); // this may cause wrong prefixed
 }
 //-----------------------------------------------
 UEClass UE_StructProperty::StaticClass()
@@ -336,7 +350,7 @@ UEClass UE_ObjectProperty::GetObjPropertyClass() const
 //----------------------------------------
 std::string UE_ObjectProperty::GetTypeStr() const
 {
-	return "class " + GetObjPropertyClass().GetName() + "*";
+	return std::format("class {}*", GetObjPropertyClass().GetCppName());
 }
 //-----------------------------------------------
 UEClass UE_ObjectProperty::StaticClass()
@@ -399,9 +413,9 @@ UEClass UE_NameProperty::StaticClass()
 }
 // UE_EnumProperty
 //-----------------------------------------------------------------------------------------------
-UE_EnumProperty UE_EnumProperty::GetUnerlyingType() const
+std::pair<PropertyType, std::string> UE_EnumProperty::GetUnerlyingType() const
 {
-	return UE_EnumProperty(static_cast<UEnumProperty*>(object)->underlayingType);
+	return UEProperty(static_cast<UEnumProperty*>(object)->underlayingType).GetPropertyType();
 }
 //----------------------------------------
 UEEnum UE_EnumProperty::GetEnum() const
@@ -411,12 +425,12 @@ UEEnum UE_EnumProperty::GetEnum() const
 //----------------------------------------
 std::string UE_EnumProperty::GetTypeStr() const
 {
-	return "enum class " + GetEnum().GetEnumTypeAsStr();
+	return GetEnum().GetEnumTypeAsStr();
 }
 //-----------------------------------------------
 UEClass UE_EnumProperty::StaticClass()
 {
-	static UEClass staticClass = UEObjectStore::FindClass("Class CoreUObject.BoolProperty");
+	static UEClass staticClass = UEObjectStore::FindClass("Class CoreUObject.EnumProperty");
 	return staticClass;
 }
 // UE_SetProperty
@@ -443,7 +457,7 @@ int32 UE_SetProperty::GetAlignmet() const
 //----------------------------------------
 std::string UE_SetProperty::GetTypeStr() const
 {
-	return "TSet<" + GetElementProperty().GetPropertyType().second + ">";
+	return std::format("TSet<{}>", GetElementProperty().GetPropertyType().second);
 }
 //-----------------------------------------------
 UEClass UE_SetProperty::StaticClass()
@@ -455,12 +469,12 @@ UEClass UE_SetProperty::StaticClass()
 //-----------------------------------------------------------------------------------------------
 UEProperty UE_MapProperty::GetKeyProperty() const
 {
-	return static_cast<UMapProperty*>(object)->keyProp;
+	return UEProperty(static_cast<UMapProperty*>(object)->keyProp);
 }
 //----------------------------------------
 UEProperty UE_MapProperty::GetValueProperty() const
 {
-	return static_cast<UMapProperty*>(object)->valueProp;
+	return UEProperty(static_cast<UMapProperty*>(object)->valueProp);
 }
 //----------------------------------------
 int32 UE_MapProperty::GetKeyOffset() const
@@ -490,7 +504,7 @@ int32 UE_MapProperty::GetAlignmet() const
 //----------------------------------------
 std::string UE_MapProperty::GetTypeStr() const
 {
-	return "TSet<" + GetKeyProperty().GetPropertyType().second + "," + GetValueProperty().GetPropertyType().second + ">";
+	return std::format("TMap<{}, {}>", GetKeyProperty().GetPropertyType().second, GetValueProperty().GetPropertyType().second);
 }
 //-----------------------------------------------
 UEClass UE_MapProperty::StaticClass()
@@ -519,7 +533,7 @@ UEClass UE_MulticastDelegateProperty::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_WeakObjectProperty::GetTypeStr() const
 {
-	return "struct TWeakObjectPtr<" + GetObjPropertyClass().GetName() + ">";
+	return std::format("struct TWeakObjectPtr<{}>", GetObjPropertyClass().GetName());
 }
 //-----------------------------------------------
 UEClass UE_WeakObjectProperty::StaticClass()
@@ -531,7 +545,7 @@ UEClass UE_WeakObjectProperty::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_InterfaceProperty::GetTypeStr() const
 {
-	return "struct FScriptInterface<" + GetObjPropertyClass().GetName() + ">";
+	return std::format("struct FScriptInterface<{}>", GetObjPropertyClass().GetName());
 }
 //-----------------------------------------------
 UEClass UE_InterfaceProperty::StaticClass()
@@ -541,22 +555,22 @@ UEClass UE_InterfaceProperty::StaticClass()
 }
 // UE_BoolProperty
 //-----------------------------------------------------------------------------------------------
-int8 UE_boolProperty::GetFieldSize() const
+uint8 UE_boolProperty::GetFieldSize() const
 {
 	return static_cast<UBoolProperty*>(object)->fieldSize;
 }
 //----------------------------------------
-int8 UE_boolProperty::GetByteOffset() const
+uint8 UE_boolProperty::GetByteOffset() const
 {
 	return static_cast<UBoolProperty*>(object)->byteOffset;
 }
 //----------------------------------------
-int8 UE_boolProperty::GetByteMask() const
+uint8 UE_boolProperty::GetByteMask() const
 {
 	return static_cast<UBoolProperty*>(object)->byteMask;
 }
 //----------------------------------------
-int8 UE_boolProperty::GetFieldMask() const
+uint8 UE_boolProperty::GetFieldMask() const
 {
 	return static_cast<UBoolProperty*>(object)->fieldMask;
 }
@@ -600,7 +614,7 @@ std::string UE_byteProperty::GetTypeStr() const
 	if (GetEnum().IsValid())
 		return GetEnum().GetEnumTypeAsStr();
 	else
-		return "int8";
+		return "uint8";
 }
 //-----------------------------------------------
 UEClass UE_byteProperty::StaticClass()
@@ -720,6 +734,7 @@ UEClass UEActor::StaticClass()
 
 std::pair<PropertyType, std::string> UEProperty::GetPropertyType() const
 {
+	if (IsA<UE_byteProperty>()) { return { PropertyType::ByteProperty, Cast<UE_byteProperty>().GetTypeStr() }; };
 	if (IsA<UE_doubleProperty>()) { return { PropertyType::DoubleProperty,Cast<UE_doubleProperty>().GetTypeStr() }; };
 	if (IsA<UE_floatProperty>()) { return { PropertyType::FloatProperty, Cast<UE_floatProperty>().GetTypeStr() }; };
 	if (IsA<UE_intProperty>()) { return { PropertyType::IntProperty, Cast<UE_intProperty>().GetTypeStr() }; };
@@ -735,7 +750,6 @@ std::pair<PropertyType, std::string> UEProperty::GetPropertyType() const
 	if (IsA<UE_StructProperty>()) { return { PropertyType::StructProperty, Cast<UE_StructProperty>().GetTypeStr() }; };
 	if (IsA<UE_NameProperty>()) { return { PropertyType::NameProperty, Cast<UE_NameProperty>().GetTypeStr() }; };
 	if (IsA<UE_boolProperty>()) { return { PropertyType::BoolProperty, Cast<UE_boolProperty>().GetTypeStr() }; }
-	if (IsA<UE_byteProperty>()) { return { PropertyType::ByteProperty, Cast<UE_byteProperty>().GetTypeStr() }; };
 	if (IsA<UE_ArrayProperty>()) { return { PropertyType::ArrayProperty, Cast<UE_ArrayProperty>().GetTypeStr() }; };
 	if (IsA<UE_EnumProperty>()) { return { PropertyType::EnumProperty, Cast<UE_EnumProperty>().GetTypeStr() }; };
 	if (IsA<UE_SetProperty>()) { return { PropertyType::SetProperty, Cast<UE_SetProperty>().GetTypeStr() }; };

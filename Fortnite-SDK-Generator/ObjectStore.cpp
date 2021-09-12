@@ -31,13 +31,12 @@ int32 UEObjectStore::GetMaxNumObjects() const
 	return GObjects->objObjects.maxNumElements;
 }
 
-template<typename UE_Type>
-int32 UEObjectStore::CountObjects(std::string objectName)
+int32 UEObjectStore::CountObjects(UEClass staticClass, std::string objectName)
 {
 	int32 count = 0; 
 	for (auto obj : UEObjectStore())
 	{
-		if (obj.IsA<UEStruct>())
+		if (obj.IsA(staticClass))
 		{
 			if (obj.GetName() == objectName)
 				count++;

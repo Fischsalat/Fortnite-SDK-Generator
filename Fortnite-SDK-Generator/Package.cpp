@@ -1,5 +1,6 @@
 #pragma once
 #include "Package.h"
+#include "ObjectStore.h"
 
 bool CompareProperties(UEProperty left, UEProperty right)
 {
@@ -16,13 +17,13 @@ bool CompareProperties(UEProperty left, UEProperty right)
 
 void Package::GenerateMembers(const std::vector<UEProperty>& memberVector, const UEStruct& super, std::vector<Package::Member>& outMembers)
 {
-	std::unordered_map<std::string, int32> objNameCache;
+	std::unordered_map<std::string, int32> nameCache;
 	int32 padCount = 0;
 
 	int32 lastPropertyOffset = super.GetStructSize();
 	int32 lastPropertySize = 0;
 
-	for (auto member : memberVector)
+	for (auto&& member : memberVector)
 	{
 		Package::Member mObj;
 
@@ -32,37 +33,41 @@ void Package::GenerateMembers(const std::vector<UEProperty>& memberVector, const
 		mObj.name = member.GetCppName();
 		mObj.size = member.GetElementSize(); 
 		mObj.offset = member.GetOffset();
-		mObj.comment = std::format("//0x%X4d(0x%X4d)", mObj.offset, mObj.size);
+		mObj.comment = std::format("0x%X4d(0x%X4d)", mObj.offset, mObj.size);
 
 		int32 lastPropertyEnd = lastPropertyOffset + lastPropertySize;
 
 		if (mObj.offset > lastPropertyEnd)
-		{
-			if (mObj.offset - lastPropertyEnd != 0x8)
-			{
-				GenerateBytePadding(padCount, lastPropertyEnd, mObj.offset - lastPropertyEnd, "");
-			}
-			else
-			{
-				try
-				{
+			outMembers.emplace_back(GenerateBytePadding(padCount, lastPropertyEnd, mObj.offset - lastPropertyEnd, "Fixing size after last property"));
+		
+		lastPropertyOffset = mObj.offset;
+		lastPropertySize = mObj.size;
 
-				}
-				catch (...) {};
-			}
+		const auto it = nameCache.find(mObj.name);
+		if (it == std::end(nameCache))
+		{
+			nameCache[mObj.name] = 1;
 		}
+		else
+		{
+			++nameCache[mObj.name];
+			mObj.name += std::format("%2d", it->second);
+		}
+
+
+		outMembers.emplace_back(std::move(mObj));
 	}
 }
-
+/*
 Package::Function Package::GenerateFunction(const UEFunction& function)
 {
 
 }
-
+*/
 Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 {
 	if (!strct.IsValid())
-		return;
+		return Package::Struct();
 
 	Package::Struct str;
 
@@ -88,9 +93,9 @@ Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 	for (UEProperty prop = strct.GetChildren().Cast<UEProperty>(); prop.IsValid(); prop = prop.GetNext().Cast<UEProperty>())
 	{
 		if(prop.GetElementSize() > 0 
-			&& !prop.IsA<UStruct>() 
-			&& !prop.IsA<UEFunction>() 
-			&& !prop.IsA<UEEnum>() 
+			&& !prop.IsA(UEStruct::StaticClass())
+			&& !prop.IsA(UEFunction::StaticClass())
+			&& !prop.IsA(UEEnum::StaticClass())
 			&& (!super.IsValid() || (super != strct && prop.GetOffset() >= super.GetStructSize())))
 		{
 			properties.push_back(prop);
@@ -102,7 +107,7 @@ Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 
 	return str;
 }
-
+/*
 Package::Class Package::GenerateClass(const UEClass& clss)
 {
 
@@ -112,7 +117,7 @@ Package::Enum Package::GenerateEnumClass(const UEEnum& enm)
 {
 
 }
-
+*/
 
 Package::Member Package::GenerateBytePadding(int32 id, int32 offset, int32 padSize, std::string reason)
 {
@@ -125,27 +130,27 @@ Package::Member Package::GenerateBytePadding(int32 id, int32 offset, int32 padSi
 
 	return padMember;
 }
-
+/*
 Package::Member Package::GenerateBitPadding(int32 id, int32 offset, int32 padSize, std::string reason)
 {
 	Member padMember;
 	padMember.name = std::format("UnknownData%02d[0x%X]", id, padSize);
 	padMember.type = "uint8";
-	padMember.size = padSize;
+	padMember.size = padSize; // fix this
 	padMember.offset = offset;
 	padMember.comment = std::move(reason);
 
 	return padMember;
 }
-
+*/
 void Package::PrintClass(const Package::Class& clss)
 {
-	std::format(R"(%s)", clss.);
+	std::format(R"(%s)"); //fix
 }
 
 void Package::PrintStruct(const Package::Struct& clss)
 {
-	std::format(R"(%s)", clss.);
+	std::format(R"(%s)"); //fix
 }
 
 void Package::PrintEnum(const Package::Enum& enm)

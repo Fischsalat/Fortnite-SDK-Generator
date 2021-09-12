@@ -1,5 +1,4 @@
 #pragma once
-#include "Global.h"
 #include "CoreClasses.h"
 #include "CoreFunctions.h"
 
@@ -40,6 +39,8 @@ public:
 
 	template<typename UE_Type>
 	bool IsA() const;
+
+	bool IsA(UEClass staticClass) const;
 	
 	template<typename UE_Type>
 	UE_Type Cast() const;
@@ -211,10 +212,10 @@ public:
 		return GetByteOffset() < other.GetByteOffset();
 	}
 
-	int8 GetFieldSize() const;
-	int8 GetByteOffset() const;
-	int8 GetByteMask() const;
-	int8 GetFieldMask() const;
+	uint8 GetFieldSize() const;
+	uint8 GetByteOffset() const;
+	uint8 GetByteMask() const;
+	uint8 GetFieldMask() const;
 	bool IsNormalBool() const;
 	bool IsBitField() const;
 
@@ -228,7 +229,7 @@ class UE_EnumProperty : public UEProperty
 public:
 	using UEProperty::UEProperty;
 
-	UE_EnumProperty GetUnerlyingType() const;
+	std::pair<PropertyType, std::string> GetUnerlyingType() const;
 	UEEnum GetEnum() const;
 
 	std::string GetTypeStr() const;
@@ -452,41 +453,44 @@ enum class PropertyType //control c control v from guitrrs dumper
 	SoftClassProperty
 };
 
+// '|' == implemented
+// "||" == strongly assumed to be working / tested
+
 /*
 class UObjectBase;										|
 class UObjectBaseUtility;								|
 class	UObject;										|
 class		UField;										|
-class			UEnum;									|
+class			UEnum;									||
 class			UProperty;								|
-class				UByteProperty;						|
-class				UUInt16Property;					|
-class				UUInt32Property;					|
-class				UUInt64Property;					|
-class				UInt8Property;						|
-class				UInt16Property;						|
-class				UIntProperty;						|
-class				UInt64Property;						|
-class				UBoolProperty;
-class				UFloatProperty;						|
-class				UDoubleProperty;					|
-class				UObjectPropertyBase;				|
-class				UObjectProperty;					|
-class					UClassProperty;					|
+class				UByteProperty;						||
+class				UUInt16Property;					||
+class				UUInt32Property;					||
+class				UUInt64Property;					||
+class				UInt8Property;						||
+class				UInt16Property;						||
+class				UIntProperty;						||
+class				UInt64Property;						||
+class				UBoolProperty;						||
+class				UFloatProperty;						||
+class				UDoubleProperty;					||
+class				UObjectPropertyBase;				||
+class				UObjectProperty;					||
+class					UClassProperty;					||
 class					UInterfaceProperty;				|
 class					UWeakObjectProperty;			|
 class					ULazyObjectProperty;
 class					UAssetObjectProperty;
-class				UNameProperty;
-class				UStructProperty;					|
-class				UStrProperty;						|
-class				UTextProperty;						|
-class				UArrayProperty;						|
-class				UDelegateProperty;
-class				UMulticastDelegateProperty;			|
-class				UMapProperty;						|
-class				USetProperty;						|
-class				UEnumProperty;						|
+class				UNameProperty;						||
+class				UStructProperty;					||
+class				UStrProperty;						||
+class				UTextProperty;						||
+class				UArrayProperty;						||
+class				UDelegateProperty;					||
+class				UMulticastDelegateProperty;			||
+class				UMapProperty;						||
+class				USetProperty;						||
+class				UEnumProperty;						||
 class			UStruct;								|
 class				UFunction;							|
 class				UClass;								|
