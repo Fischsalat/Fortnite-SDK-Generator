@@ -162,7 +162,6 @@
   <ItemGroup>
     <ClInclude Include="ClassWrapper.h" />
     <ClInclude Include="CoreFunctions.h" />
-    <ClInclude Include="dbg.h" />
     <ClInclude Include="Flags.h" />
     <ClInclude Include="Generator.h" />
     <ClInclude Include="Global.h" />

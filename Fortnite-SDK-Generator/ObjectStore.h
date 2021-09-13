@@ -6,6 +6,7 @@ class UEObjectStore
 {
 
 public:
+	static void DumpObjects();
 
 	static bool Initialize();
 

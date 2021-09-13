@@ -9,15 +9,18 @@ class Package
 private: 
 	UEObject packageObj;
 
+protected:
+	std::unordered_set<int32> generatedStructs;
+
 public:
 	Package(UEObject _packageObj) : packageObj(_packageObj)
 	{
 	}
 
 private:
+public:
 	struct Member
 	{
-		bool bIsBitField;					// ture/false like bruh, I don't think I need to document the states of a bool
 		std::string type;					// int32 / float / class UClass* / enum class ETextGender / class UWorld* /
 		std::string name;					// bIsBeingKicked : 1; bIsAlive, TimeStartedWaiting [no prefix]
 		int32 offset;						// 0x30
@@ -39,6 +42,16 @@ private:
 		std::string cppFullName;			// void APlayerController::SwitchLevel(FString URL);
 		int32 numParams;					// 1
 		int32 flags;						// 0x400
+
+		struct Parameter
+		{
+			enum class Type
+			{
+				Normal,
+				Out,
+				Return
+			};
+		};
 	}; 
 	struct Struct
 	{
@@ -55,7 +68,7 @@ private:
 	};
 
 private:
-
+public:
 	static std::vector<Struct> structs;
 	static std::vector<Class> classes;
 
@@ -75,9 +88,9 @@ private:
 	void PrintMembers(const std::vector<UEProperty>& mem, std::vector<Member> outMembers);
 
 	void GenerateMembers(const std::vector<UEProperty>&, const UEStruct& super, std::vector<Member>& outMembers);
-	Function GenerateFunction(const UEFunction& function);
+	Function GenerateFunction(const UEFunction& function, const UEStruct& super);
 	Struct GenerateScritStruct(const UEStruct& strct);
-	//Class GenerateClass(const UEClass& clss);
+	Class GenerateClass(const UEClass& clss);
 	Enum GenerateEnumClass(const UEEnum& enm);
 
 	Member GenerateBytePadding(int32 id, int32 offset, int32 padSize, std::string reason);

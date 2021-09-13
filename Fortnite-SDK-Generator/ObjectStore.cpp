@@ -3,6 +3,18 @@
 //-----------------------------------------------------------------------------------------------
 //UEObjectStore
 //-----------------------------------------------------------------------------------------------
+void UEObjectStore::DumpObjects()
+{
+	std::ofstream stream("GUObjectArray.txt");
+
+	stream << "Objects-dump for Fortnite 1.2\n\nNumber of objects: " << GObjects->Num() << "\n\n";
+
+	for (auto obj : UEObjectStore())
+	{
+		stream << std::format("[{:08X}]\t{:{}}\n", obj.GetInernalIndex(), obj.GetFullName(), 20);
+	}
+}
+
 bool UEObjectStore::Initialize()
 {
 	GObjects = reinterpret_cast<FUObjectArray*>(reinterpret_cast<uintptr_t>(GetModuleHandle(0)) + Offset::GObjects);

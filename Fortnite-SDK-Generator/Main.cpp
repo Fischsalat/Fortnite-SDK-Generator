@@ -7,28 +7,14 @@
 #include "CoreFunctions.h"
 #include "ClassWrapper.h"
 #include "ObjectStore.h"
-#include "dbg.h"
+#include "Package.h"
 
-
-template<typename T>
-bool IsAA(UEObject obj)
-{
-	if (obj.GetClass().IsValid())
-	{
-		for (UEClass clss = obj.GetClass(); clss.IsValid(); clss = clss.GetSuper().Cast<UEClass>())
-		{
-			if (clss == T::StaticClass() && clss.GetFullName().find("Default__") == NPOS)
-				return true;
-		}
-		return false;
-	}
-	return false;
-}
 
 std::string GetWorld()
 {
-	return "World!";
+	return "World";
 }
+
 
 DWORD WINAPI Main(LPVOID lpParam)
 {
@@ -41,17 +27,59 @@ DWORD WINAPI Main(LPVOID lpParam)
 
 	std::cout << "search" << std::endl;
 	
+	std::cout << std::format("Hello{:{}X}", 0xFF, 50) << "\n\n\n";
 
 
-	std::cout << std::format("Hello {}", GetWorld()) << std::endl;
-
-	std::ofstream streem("Properties_Enums.txt");
-
+	
 	for (auto obj : UEObjectStore())
 	{
-		if (obj.GetFullName() ==
-	}
 
+		if (obj.IsA(UEEnum::StaticClass()))
+		{
+			Package pack(obj.GetPackage());
+
+			Package::Enum myEnum = pack.GenerateEnumClass(UEEnum(obj.GetUObject()));
+
+			std::cout << std::format("//{}\n{} : {}\n", myEnum.fullName, myEnum.name, myEnum.underlayingType);
+			std::cout << "{\n";
+
+			for (int i = 0; i < myEnum.members.size(); i++)
+			{
+				std::cout << std::format("\t{:{}}= {},", myEnum.members[i], 45, i) << std::endl;
+			}
+			std::cout << "};\n\n";
+		}
+		
+
+		/*
+		if (obj.GetFullName() == "Class Engine.ExponentialHeightFogComponent")
+		{
+			UEClass casted = obj.Cast<UEClass>();
+
+			std::cout << "//" << obj.GetFullName() << std::endl;
+			std::cout << std::format("//0x{:04X} (0x{:04X} - 0x{:04X})", casted.GetStructSize() - casted.GetSuper().GetStructSize(), casted.GetStructSize(), casted.GetSuper().GetStructSize()) << std::endl;
+
+			if (casted.GetSuper().IsValid())
+				std::cout << std::format("class {} : {}", casted.GetUniqueName(), casted.GetSuper().GetCppName()) << std::endl;
+			else
+				std::cout << std::format("class {}", casted.GetUniqueName()) << std::endl;
+
+			std::cout << "{" << std::endl;
+
+
+			for (UEProperty prop = casted.GetChildren().Cast<UEProperty>(); prop.IsValid(); prop = prop.GetNext().Cast<UEProperty>())
+			{
+				std::cout << std::format("\t{:{}}\t\t{:{}}\t\t//0x{:04X}(0x{:04X})", prop.GetPropertyType().second, 35, prop.GetName(), 33, prop.GetOffset(), prop.GetElementSize()) << std::endl;
+				//std::cout << std::format("\t{:{}}{}", "Hello", 35, "World!") << std::endl;
+			}
+
+			//std::cout << std::format("Hello{:{}X}", 0xFF, 50) << "\n\n\n";
+
+			std::cout << "};" << std::endl;
+			break;
+		}
+		*/
+	}
 	std::cout << "nfi" << std::endl;
 	
 	return 0;

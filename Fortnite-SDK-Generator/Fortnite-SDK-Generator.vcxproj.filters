@@ -59,9 +59,6 @@
     <ClInclude Include="ClassWrapper.h">
       <Filter>Headerdateien\Engine-Wrapper</Filter>
     </ClInclude>
-    <ClInclude Include="dbg.h">
-      <Filter>Quelldateien</Filter>
-    </ClInclude>
     <ClInclude Include="Package.h">
       <Filter>Headerdateien\Generator</Filter>
     </ClInclude>

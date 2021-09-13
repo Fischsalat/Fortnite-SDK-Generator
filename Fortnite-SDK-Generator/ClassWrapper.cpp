@@ -181,7 +181,10 @@ std::vector<std::string> UEEnum::GetAllNames() const
 
 	for (int i = 0; i < tempArray.Num(); i++)
 	{
-		returnVec.push_back(tempArray[i].value.ToString());
+		std::string fullEnumName = tempArray[i].value.ToString();
+		int d = fullEnumName.find_last_of(":");
+
+		d != NPOS ? returnVec.push_back(fullEnumName.substr(d + 1)) : returnVec.push_back(fullEnumName);
 	}
 	return returnVec;
 }
@@ -205,7 +208,7 @@ std::string UEStruct::GetUniqueName() const
 	std::string name;
 
 	if (UEObjectStore::CountObjects(UEStruct::StaticClass(), GetName()) > 1)
-		name += GetOuter().GetCppName();
+		name += "FN_";
 
 	return name += GetCppName();
 }
