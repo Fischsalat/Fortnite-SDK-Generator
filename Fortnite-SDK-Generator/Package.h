@@ -17,8 +17,8 @@ public:
 	{
 	}
 
+
 private:
-public:
 	struct Member
 	{
 		std::string type;					// int32 / float / class UClass* / enum class ETextGender / class UWorld* /
@@ -68,11 +68,11 @@ public:
 	};
 
 private:
-public:
-	static std::vector<Struct> structs;
-	static std::vector<Class> classes;
+	std::vector<Enum> allEnums;
+	std::vector<Struct> allStructs;
+	std::vector<Class> allClasses;
 
-	//void Process(UEObject package, std::unordered_map<UEObject, bool>& processedObjects);
+	void Process(std::unordered_map<UEObject, bool>& processedStructs);
 
 	bool IsDependend(const UEObject& obj);
 

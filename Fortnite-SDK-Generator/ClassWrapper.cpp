@@ -726,7 +726,12 @@ UEClass UE_doubleProperty::StaticClass()
 }
 //-----------------------------------------------------------------------------------------------
 
-
+//UEPackage
+UEClass UEPackage::StaticClass()
+{
+	static UEClass staticClass = UEObjectStore::FindClass("Class CoreUObject.Package");
+	return staticClass;
+}
 //UEActor
 //-----------------------------------------------------------------------------------------------
 UEClass UEActor::StaticClass()

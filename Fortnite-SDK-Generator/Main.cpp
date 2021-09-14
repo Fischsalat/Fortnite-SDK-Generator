@@ -33,7 +33,14 @@ DWORD WINAPI Main(LPVOID lpParam)
 	
 	for (auto obj : UEObjectStore())
 	{
+		if (obj.IsA(UE_EnumProperty::StaticClass()) && obj.GetName().find("Default__") == NPOS)
+		{
+			std::cout << obj.Cast<UE_EnumProperty>().GetTypeStr() << std::endl;
+			std::cout << obj.Cast<UE_EnumProperty>().GetUnerlyingType().second << std::endl;
+		}
+			
 
+		/*
 		if (obj.IsA(UEEnum::StaticClass()))
 		{
 			Package pack(obj.GetPackage());
@@ -49,7 +56,7 @@ DWORD WINAPI Main(LPVOID lpParam)
 			}
 			std::cout << "};\n\n";
 		}
-		
+		*/
 
 		/*
 		if (obj.GetFullName() == "Class Engine.ExponentialHeightFogComponent")

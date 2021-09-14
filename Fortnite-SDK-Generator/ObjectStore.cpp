@@ -79,6 +79,20 @@ UEClass UEObjectStore::FindClass(std::string className)
 	return UEObjectStore::FindObject<UEClass>(className);
 }
 
+void UEObjectStore::GetAllPackages(std::vector<UEObject>& outPackages)
+{
+	for (auto obj : UEObjectStore())
+	{
+		if (obj.GetClass() == UEPackage::StaticClass())
+		{
+			std::string objName = obj.GetName();
+			if (objName.find("Default__") == NPOS || objName.find("Uninitialized") == NPOS || objName.find("placeholder") == NPOS)
+				outPackages.push_back(std::move(obj));
+		}
+		
+	}
+}
+
 UObjectIterator UEObjectStore::begin()
 {
 	return UObjectIterator(*this, 0);

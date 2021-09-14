@@ -411,6 +411,13 @@ public:
 };
 
 
+class UEPackage : public UEObject
+{
+public:
+
+	static UEClass StaticClass();
+};
+
 class UEActor : public UEObject
 {
 public:

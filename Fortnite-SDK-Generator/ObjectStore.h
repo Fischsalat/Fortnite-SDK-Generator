@@ -21,6 +21,8 @@ public:
 	
 	static UEClass FindClass(std::string className);
 
+	static void GetAllPackages(std::vector<UEObject>& outPackages);
+
 	class UObjectIterator begin();
 	class UObjectIterator begin() const;
 

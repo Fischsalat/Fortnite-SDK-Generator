@@ -11,6 +11,10 @@ bool CompareProperties(UEProperty left, UEProperty right)
 	return left.GetOffset() < right.GetOffset();
 }
 
+void Package::Process(std::unordered_map<UEObject, bool>& processedStructs)
+{
+	
+}
 
 
 void Package::GenerateMembers(const std::vector<UEProperty>& memberVector, const UEStruct& super, std::vector<Package::Member>& outMembers)
@@ -83,10 +87,21 @@ Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 	if (!strct.IsValid())
 		return Package::Struct();
 
+	std::string structName = strct.GetUniqueName();
+
+	if (structName.find("Default__") != NPOS || structName.find("Uninitialized") != NPOS || structName.find("placeholder") != NPOS)
+		return Package::Struct();
+
+	auto structsIt = generatedStructs.find(structName);
+	if (structsIt == generatedStructs.end())
+		generatedStructs.emplace(structName);
+	else
+		return Package::Struct();
+
 	Package::Struct str;
 
 	str.fullName = strct.GetFullName();
-	str.cppName = strct.GetUniqueName();
+	str.cppName = structName;
 	str.inheritedSize = 0;
 	str.structSize = 0;
 	
@@ -125,10 +140,22 @@ Package::Class Package::GenerateClass(const UEClass& clss)
 	if (!clss.IsValid())
 		return Package::Class();
 
+	std::string className = clss.GetUniqueName();
+
+	if (className.find("Default__") != NPOS || className.find("Uninitialized") != NPOS || className.find("placeholder") != NPOS)
+		return Package::Class();
+
+	auto structsIt = generatedStructs.find(className);
+	if (structsIt == generatedStructs.end())
+		generatedStructs.emplace(className);
+	else
+		return Package::Class();
+
+
 	Package::Class cls;
 
 	cls.fullName = clss.GetFullName();
-	cls.cppName = clss.GetUniqueName();
+	cls.cppName = className;
 	cls.inheritedSize = 0;
 	cls.structSize = 0;
 
@@ -194,14 +221,7 @@ Package::Member Package::GenerateBytePadding(int32 id, int32 offset, int32 padSi
 /*
 Package::Member Package::GenerateBitPadding(int32 id, int32 offset, int32 padSize, std::string reason)
 {
-	Member padMember;
-	padMember.name = std::format("UnknownData%02d[0x%X]", id, padSize);
-	padMember.type = "uint8";
-	padMember.size = padSize; // fix this
-	padMember.offset = offset;
-	padMember.comment = std::move(reason);
-
-	return padMember;
+	
 }
 */
 void Package::PrintClass(const Package::Class& clss)
