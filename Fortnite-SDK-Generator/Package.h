@@ -8,9 +8,7 @@ class Package
 {
 private: 
 	UEObject packageObj;
-
-protected:
-	std::unordered_set<int32> generatedStructs;
+	static std::unordered_set<int32> generatedStructs;
 
 public:
 	Package(UEObject _packageObj) : packageObj(_packageObj)
@@ -67,13 +65,15 @@ private:
 		std::vector<Function> functions;
 	};
 
-private:
+
 	std::vector<Enum> allEnums;
 	std::vector<Struct> allStructs;
 	std::vector<Class> allClasses;
 
-	void Process(std::unordered_map<UEObject, bool>& processedStructs);
+public:
+	void Process(UEObject object, std::unordered_map<UEObject, bool>& processedStructs);
 
+private:
 	bool IsDependend(const UEObject& obj);
 
 	void GeneratePrequesites(const UEObject& obj, std::unordered_map<UEObject, bool>& processedObjects);
@@ -89,8 +89,8 @@ private:
 
 	void GenerateMembers(const std::vector<UEProperty>&, const UEStruct& super, std::vector<Member>& outMembers);
 	Function GenerateFunction(const UEFunction& function, const UEStruct& super);
-	Struct GenerateScritStruct(const UEStruct& strct);
-	Class GenerateClass(const UEClass& clss);
+	Struct GenerateScritStruct(const UEStruct& strct, std::unordered_map<UEObject, bool> processedObjects);
+	Class GenerateClass(const UEClass& clss, std::unordered_map<UEObject, bool> processedObjects);
 	Enum GenerateEnumClass(const UEEnum& enm);
 
 	Member GenerateBytePadding(int32 id, int32 offset, int32 padSize, std::string reason);

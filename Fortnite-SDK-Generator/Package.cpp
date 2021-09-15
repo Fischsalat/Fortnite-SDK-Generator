@@ -11,9 +11,26 @@ bool CompareProperties(UEProperty left, UEProperty right)
 	return left.GetOffset() < right.GetOffset();
 }
 
-void Package::Process(std::unordered_map<UEObject, bool>& processedStructs)
+void Package::Process(UEObject object, std::unordered_map<UEObject, bool>& processedStructs)
 {
-	
+	for (auto obj : UEObjectStore())
+	{
+		if (object.GetPackage() == packageObj)
+		{
+			if (object.IsA(UEEnum::StaticClass()))
+			{
+				GenerateEnumClass(object.Cast<UEEnum>());
+			}
+			else if (object.IsA(UEStruct::StaticClass()))
+			{
+				GenerateScritStruct(object.Cast<UEStruct>());
+			}
+			else if (object.IsA(UEClass::StaticClass()))
+			{
+				GenerateClass(object.Cast<UEClass>());
+			}
+		}
+	}
 }
 
 
@@ -82,7 +99,7 @@ Package::Function Package::GenerateFunction(const UEFunction& function, const UE
 	func.flags = function.GetFlags();
 }
 
-Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
+Package::Struct Package::GenerateScritStruct(const UEStruct& strct, std::unordered_map<UEObject, bool> processedObjects)
 {
 	if (!strct.IsValid())
 		return Package::Struct();
@@ -92,11 +109,6 @@ Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 	if (structName.find("Default__") != NPOS || structName.find("Uninitialized") != NPOS || structName.find("placeholder") != NPOS)
 		return Package::Struct();
 
-	auto structsIt = generatedStructs.find(structName);
-	if (structsIt == generatedStructs.end())
-		generatedStructs.emplace(structName);
-	else
-		return Package::Struct();
 
 	Package::Struct str;
 
@@ -135,7 +147,7 @@ Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 	return str;
 }
 
-Package::Class Package::GenerateClass(const UEClass& clss)
+Package::Class Package::GenerateClass(const UEClass& clss, std::unordered_map<UEObject, bool> processedObjects)
 {
 	if (!clss.IsValid())
 		return Package::Class();
@@ -145,11 +157,6 @@ Package::Class Package::GenerateClass(const UEClass& clss)
 	if (className.find("Default__") != NPOS || className.find("Uninitialized") != NPOS || className.find("placeholder") != NPOS)
 		return Package::Class();
 
-	auto structsIt = generatedStructs.find(className);
-	if (structsIt == generatedStructs.end())
-		generatedStructs.emplace(className);
-	else
-		return Package::Class();
 
 
 	Package::Class cls;
@@ -224,27 +231,3 @@ Package::Member Package::GenerateBitPadding(int32 id, int32 offset, int32 padSiz
 	
 }
 */
-void Package::PrintClass(const Package::Class& clss)
-{
-	std::format(R"(%s)"); //fix
-}
-
-void Package::PrintStruct(const Package::Struct& clss)
-{
-	std::format(R"(%s)"); //fix
-}
-
-void Package::PrintEnum(const Package::Enum& enm)
-{
-
-}
-
-void Package::PrintMembers(const std::vector<UEProperty>& mem, std::vector<Member> outMembers)
-{
-
-}
-
-void Package::PrintFunction(const Package::Function& func)
-{
-
-}

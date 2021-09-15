@@ -10,7 +10,11 @@
 #include <string>
 #include <vector>
 
-#define  NPOS std::string::npos
+#include "Settings.h"
+
+#define NPOS std::string::npos
+
+namespace fs = std::filesystem;
 
 typedef __int8 int8;
 typedef __int16 int16;

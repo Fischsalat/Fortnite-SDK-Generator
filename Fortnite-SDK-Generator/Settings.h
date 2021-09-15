@@ -5,33 +5,43 @@
 namespace Settings
 {
 	
-	std::string GetPath()
+	__forceinline std::string GetPath()
 	{
 		return "C:\\SDKGen";
 	}
 	
-	bool ShouldUseNamespaceForSDK()
+	__forceinline bool ShouldUseNamespaceForSDK()
 	{
 		return true;
 	}
 
-	std::string GetSDKNamespace()
+	__forceinline std::string GetSDKNamespace()
 	{
 		return "SDK";
 	}
 	
-	bool ShouldUseNamespaceForParams()
+	__forceinline bool ShouldUseNamespaceForParams()
 	{
 		return true;
 	}
 	
-	std::string GetParamNamespace()
+	__forceinline std::string GetParamNamespace()
 	{
 		return "param";
 	}
 
-	bool ShouldUseStrings()
+	__forceinline bool ShouldUseStrings()
 	{
 		return true;
+	}
+
+	__forceinline bool ShouldUsePrecompiledHeaders()
+	{
+		return true;
+	}
+
+	__forceinline std::string GetGameVersion()
+	{
+		return "1.2";
 	}
 };
