@@ -94,12 +94,16 @@ Package::Function Package::GenerateFunction(const UEFunction& function, const UE
 
 	Package::Function func;
 
+	func.  selfAsStruct = GenerateScritStruct(function); // UFunction : public UStruct
+
 	func.cppName = function.GetCppName();
+	func.superName = function.GetSuper().GetUniqueName();
+	func.paramName = func.superName + "_" + func.cppName + "_" + "Params";
 	func.numParams = function.GetNumParams();
 	func.flags = function.GetFlags();
 }
 
-Package::Struct Package::GenerateScritStruct(const UEStruct& strct, std::unordered_map<UEObject, bool> processedObjects)
+Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 {
 	if (!strct.IsValid())
 		return Package::Struct();
@@ -147,7 +151,7 @@ Package::Struct Package::GenerateScritStruct(const UEStruct& strct, std::unorder
 	return str;
 }
 
-Package::Class Package::GenerateClass(const UEClass& clss, std::unordered_map<UEObject, bool> processedObjects)
+Package::Class Package::GenerateClass(const UEClass& clss)
 {
 	if (!clss.IsValid())
 		return Package::Class();

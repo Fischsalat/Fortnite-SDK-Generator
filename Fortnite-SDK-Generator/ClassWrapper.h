@@ -31,6 +31,7 @@ public:
 	int32 GetInernalIndex() const;
 	int32 GetComparisonIndex() const;
 	std::string GetName() const;
+	FName GetFName() const;
 	std::string GetFullName() const;
 	std::string GetCppName() const;
 	UEObject GetOuter() const;

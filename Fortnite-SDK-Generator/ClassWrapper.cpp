@@ -50,6 +50,11 @@ int32 UEObject::GetComparisonIndex() const
 	return object->name.comparisonIndex;
 }
 //----------------------------------------
+FName UEObject::GetFName() const
+{
+	return object->name;
+}
+//----------------------------------------
 std::string UEObject::GetName() const
 {
 	return object->GetName();
@@ -208,9 +213,9 @@ std::string UEStruct::GetUniqueName() const
 	std::string name;
 
 	if (UEObjectStore::CountObjects(UEStruct::StaticClass(), GetName()) > 1)
-		name += "FN_";
-
-	return name += GetCppName();
+		name += GetCppName() + "_" + std::to_string(GetFName().number);
+	else
+		return name += GetCppName();
 }
 //----------------------------------------
 UEStruct UEStruct::GetSuper() const
