@@ -73,18 +73,31 @@ void Generator::GenerateStructsFile(std::ofstream& stream, const std::vector<Pac
 			stream << std::format("//0x{:04X}", scriptStruct.structSize);
 		else
 			stream << std::format("//0x{:04X} (0x{:04X} - 0x{:04X})", scriptStruct.structSize - scriptStruct.inheritedSize, scriptStruct.structSize, scriptStruct.inheritedSize);
-
+		
 		stream << scriptStruct.cppFullName << "\n{\n";
 
 		for (auto member : scriptStruct.members)
 		{
-			stream << std::format("\t{:{}}{:{}}//{}({})", member.type, 50, member.name += ";", 100, member.offset, member.size);
+			stream << std::format("\t{:{}}{:{}}//", member.type, 50, member.name += ";", 100, member.comment);
 		}
 		
 		stream << "};\n\n\n";
 	}
 
 	PrintFileEnding(stream, FileType::Struct);
+}
+
+void Generator::GenerateClassFile(std::ofstream& stream, const std::vector<Package::Class>& classes) const
+{
+	PrintFileHeader(stream, FileType::Class);
+
+	for (auto clss : classes)
+	{
+
+	}
+
+
+	PrintFileEnding(stream, FileType::Class);
 }
 
 void Generator::GenerateParameterFile(std::ofstream& stream, const std::vector<Package::Function>& parameters) const
@@ -101,7 +114,7 @@ void Generator::GenerateParameterFile(std::ofstream& stream, const std::vector<P
 		else
 			stream << std::format("//0x{:04X} (0x{:04X} - 0x{:04X})", parm.selfAsStruct.structSize - parm.selfAsStruct.inheritedSize, parm.selfAsStruct.structSize, parm.selfAsStruct.inheritedSize);
 
-		stream << parm.paramName << "\n{\n";
+		stream << parm.parameterStructName << "\n{\n";
 
 		for (auto member : parm.selfAsStruct.members)
 		{
@@ -120,14 +133,60 @@ void Generator::GenerateFunctionFile(std::ofstream& stream, const std::vector<Pa
 
 	for (auto func : functions)
 	{
-		stream << std::format("//{}\n\n{}\n", func.fullName, func.cppFullName);
+		stream << std::format("//{}\n({})\n{} {}::{}(", func.fullName, func.allFlags, func.returnType, func.superName, func.cppName);
+
+		for (int i = 0; i < func.params.size(); i++)
+		{
+			if (func.params[i].nameOnly != "ReturnValue" || func.params[i].nameOnly != "FReturnValue")
+			{
+				stream << func.params[i].typedName;
+
+				if (i != func.params.size() - 1)
+					stream << ", ";
+			}
+		}
+		stream << ")\n";
+
 		stream << "{\n";
 		stream << std::format("\tstatic auto fn = UObject::FindObject<UFunction>(\"{}\");\n\n", func.fullName);
 		
 		if (Settings::ShouldUseNamespaceForParams())
-			stream << Settings::GetParamNamespace() << "::";
+		{
+			stream << "\t" << Settings::GetParamNamespace() << "::" << func.parameterStructName << " params;\n";
+		}
+		else
+		{
+			stream << "\t" << func.parameterStructName << " params;\n";
+		}
+			
+		for (auto parm : func.params)
+		{
+			if (parm.nameOnly != "ReturnValue" || parm.nameOnly != "FReturnValue")
+			{
+				stream << std::format("\tparams.{} = {};\n", parm.nameOnly, parm.nameOnly);
+			}
+		}
 
-		stream << func.paramName; //finish writing this please
+		stream << "\n";
+
+		if (func.bIsNative)
+		{
+			"\tauto flags = fn->functionFlags\nfn->functionFlags |= 0x400;\n\n";
+		}
+
+		stream << "\tUObject::ProcessEvent(fn, &params);\n\n";
+
+		if (func.bIsNative)
+		{
+			"\tfn->functionFlags = flags;\n\n";
+		}
+
+		if (func.bHasReturnValue)
+		{
+			stream << "\treturn parms.ReturnValue;";
+		}
+			
+		stream << "\n}";
 	}
 
 	PrintFileEnding(stream, FileType::Function);

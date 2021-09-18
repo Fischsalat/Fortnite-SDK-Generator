@@ -11,7 +11,7 @@ bool CompareProperties(UEProperty left, UEProperty right)
 	return left.GetOffset() < right.GetOffset();
 }
 
-void Package::Process(UEObject object, std::unordered_map<UEObject, bool>& processedStructs)
+void Package::Process(UEObject object)
 {
 	for (auto obj : UEObjectStore())
 	{
@@ -19,15 +19,15 @@ void Package::Process(UEObject object, std::unordered_map<UEObject, bool>& proce
 		{
 			if (object.IsA(UEEnum::StaticClass()))
 			{
-				GenerateEnumClass(object.Cast<UEEnum>());
+				GenerateEnumClass(UEEnum(object.GetUObject()));
 			}
 			else if (object.IsA(UEStruct::StaticClass()))
 			{
-				GenerateScritStruct(object.Cast<UEStruct>());
+				GenerateScritStruct(UEStruct(object.GetUObject()));
 			}
 			else if (object.IsA(UEClass::StaticClass()))
 			{
-				GenerateClass(object.Cast<UEClass>());
+				GenerateClass(UEClass(object.GetUObject()));
 			}
 		}
 	}
@@ -61,7 +61,7 @@ void Package::GenerateMembers(const std::vector<UEProperty>& memberVector, const
 		mObj.name = member.GetCppName();
 		mObj.size = member.GetElementSize(); 
 		mObj.offset = member.GetOffset();
-		mObj.comment = std::format("0x%X4d(0x%X4d)", mObj.offset, mObj.size);
+		mObj.comment = std::format("0x{:04X}(0x{:04X})({})", mObj.offset, mObj.size, member.GetFlagsAsString());
 
 		int32 lastPropertyEnd = lastPropertyOffset + lastPropertySize;
 
@@ -94,13 +94,48 @@ Package::Function Package::GenerateFunction(const UEFunction& function, const UE
 
 	Package::Function func;
 
-	func.  selfAsStruct = GenerateScritStruct(function); // UFunction : public UStruct
+	func.selfAsStruct = GenerateScritStruct(function); // UFunction : public UStruct
 
 	func.cppName = function.GetCppName();
 	func.superName = function.GetSuper().GetUniqueName();
-	func.paramName = func.superName + "_" + func.cppName + "_" + "Params";
+	func.parameterStructName = func.superName + "_" + func.cppName + "_" + "Params";
 	func.numParams = function.GetNumParams();
-	func.flags = function.GetFlags();
+	func.bHasReturnValue = false;
+	func.allFlags = function.GetFlagsAsString();
+
+	for (UEProperty childParam = function.GetChildren().Cast<UEProperty>(); childParam.IsValid(); childParam = childParam.GetNext().Cast<UEProperty>())
+	{
+		Package::Function::Parameter param;
+
+		param.bIsConst = childParam.HasFlag(EPropertyFlags::ConstParm) ? true : false;
+		param.bIsReference = childParam.HasFlag(EPropertyFlags::ReferenceParm) ? true : false;
+
+		if (childParam.HasFlag(EPropertyFlags::ReturnParm))
+		{
+			param.paramType = Package::Function::Parameter::ParameterType::Return;
+			func.bHasReturnValue = true;
+			func.returnType = childParam.GetPropertyType().second;
+		}
+		else if (childParam.HasFlag(EPropertyFlags::OutParm))
+			param.paramType = Package::Function::Parameter::ParameterType::Out;
+		else
+			param.paramType = Package::Function::Parameter::ParameterType::Normal;
+		
+
+		if (param.bIsConst)
+			param.typedName += "const ";
+
+		param.typedName += childParam.GetPropertyType().second;
+
+		if (param.bIsReference)
+			param.typedName += "&";
+
+		param.typedName += " " + childParam.GetCppName();
+
+		param.nameOnly = childParam.GetCppName();
+
+		func.params.emplace_back(std::move(param));
+	}
 }
 
 Package::Struct Package::GenerateScritStruct(const UEStruct& strct)

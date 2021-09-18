@@ -103,9 +103,12 @@ public:
 	using UEStruct::UEStruct;
 
 	EFunctionFlags GetFunctionFlags() const;
+	std::string GetFlagsAsString() const;
 	uint8 GetNumParams() const;
 	uint16 GetParamSize() const;
 	uint16 GetRetOffset() const;
+
+	bool HasFlag(const EFunctionFlags flag) const;
 
 	static UEClass StaticClass();
 };
@@ -118,8 +121,11 @@ public:
 	int32 GetElementSize() const;
 	int32 GetArrayDim() const;
 	EPropertyFlags GetPropertyFlags() const;
+	std::string GetFlagsAsString() const;
 	int32 GetOffset() const;
 	UEProperty GetNextProperty() const;
+
+	bool HasFlag(const EPropertyFlags flag) const;
 
 	static UEClass StaticClass();
 

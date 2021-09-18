@@ -25,7 +25,7 @@ public:
 		int32 offset;						// 0x30
 		int32 size;							// 0x128
 
-		std::string comment;
+		std::string comment;				// 0x164(0x000C)(ZeroConstructor, InstancedReference, BlueprintAssignable)
 	}; 
 	struct Enum
 	{
@@ -45,23 +45,35 @@ public:
 	};
 	struct Function
 	{
-
-		enum class ParameterType
+		struct Parameter
 		{
-			Normal,
-			Out,
-			Return
+			enum class ParameterType
+			{
+				Normal,
+				Out,
+				Return
+			};
+
+			bool bIsReference;
+			bool bIsConst;
+			std::string typedName; // const struct FString& URL
+			std::string nameOnly;
+
+			ParameterType paramType;
 		};
 
-		ParameterType paramType;
 		Struct selfAsStruct;
+		std::vector<Parameter> params;
+
+		std::string parameterStructName;	// APlayerController_SwitchLevel_Params
 		std::string fullName;				// Function Engine.PlayerController.SwitchLevel
-		std::string paramName;
 		std::string superName;				// APlayerController
 		std::string cppName;				// SwitchLevel
-		std::string cppFullName;			// void APlayerController::SwitchLevel(FString URL);
+		std::string allFlags;				// (Exec, Native, Public)
 		int32 numParams;					// 1
-		int32 flags;						// 0x400
+		bool bIsNative;						// flags: 0x400
+		bool bHasReturnValue;				// bool:tm:
+		std::string returnType = "void";	// void / struct FString / class UClass*
 	};
 	struct Class : public Struct
 	{

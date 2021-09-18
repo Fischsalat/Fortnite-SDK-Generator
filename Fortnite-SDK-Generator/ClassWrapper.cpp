@@ -262,6 +262,16 @@ EFunctionFlags UEFunction::GetFunctionFlags() const
 	return static_cast<UFunction*>(object)->functionFlags;
 }
 //----------------------------------------
+std::string UEFunction::GetFlagsAsString() const
+{
+	return static_cast<UFunction*>(object)->GetFlagsAsString();
+}
+//----------------------------------------
+bool UEFunction::HasFlag(EFunctionFlags flag) const
+{
+	return static_cast<UFunction*>(object)->functionFlags & flag;
+}
+//----------------------------------------
 uint8 UEFunction::GetNumParams() const
 {
 	return static_cast<UFunction*>(object)->numberParams;
@@ -295,7 +305,17 @@ int32 UEProperty::GetArrayDim() const
 //----------------------------------------
 EPropertyFlags UEProperty::GetPropertyFlags() const
 {
-	return static_cast<UProperty*>(object)->propFlags;
+	return static_cast<UProperty*>(object)->propertyFlags;
+}
+//----------------------------------------
+std::string UEProperty::GetFlagsAsString() const
+{
+	return static_cast<UProperty*>(object)->GetFlagsAsString();
+}
+//----------------------------------------
+bool UEProperty::HasFlag(EPropertyFlags flag) const
+{
+	return static_cast<UProperty*>(object)->propertyFlags & flag;
 }
 //----------------------------------------
 int32 UEProperty::GetOffset() const

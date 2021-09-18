@@ -196,6 +196,8 @@ public:
 	uint16 offsetReturnValue;
 	uint8 pad_20[0x1C];
 	void* func;
+
+	std::string GetFlagsAsString() const;
 };
 
 class UScriptStruct : public UStruct
@@ -211,11 +213,13 @@ public:
 	int32 arrayDim;
 	int32 elementSize;
 	int8 pad_25[0x10];
-	EPropertyFlags propFlags;
+	EPropertyFlags propertyFlags;
 	int32_t offsetInternal;
 	int8 pad_30[0x4];
 	UProperty* propertyLinkNext;
 	int8 pad_35[0x18];
+
+	std::string GetFlagsAsString() const;
 };
 
 class UStructProperty : public UProperty
