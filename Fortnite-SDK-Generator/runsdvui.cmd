@@ -1,2 +1,0 @@
-cd /d "C:\Users\Flo\source\repos\Fortnite-SDK-Generator\Fortnite-SDK-Generator" &msbuild "Fortnite-SDK-Generator.vcxproj" /t:sdvViewer /p:configuration="Debug" /p:platform="x64" /p:SolutionDir="C:\Users\Flo\source\repos\Fortnite-SDK-Generator" 
-exit %errorlevel% 
