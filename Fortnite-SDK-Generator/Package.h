@@ -84,9 +84,10 @@ public:
 	std::vector<Enum> allEnums;
 	std::vector<Struct> allStructs;
 	std::vector<Class> allClasses;
+	std::vector<Function> allFunctions;
 
 public:
-	void Process(UEObject object);
+	void Process();
 
 private:
 	bool IsDependend(const UEObject& obj);
@@ -96,11 +97,6 @@ private:
 	void GenerateMemberPrequesites(const UEObject& obj);
 	
 
-	void PrintClass(const Class& clss);
-	void PrintStruct(const Struct& strct);
-	void PrintEnum(const Enum& enm);
-	void PrintFunction(const Function& func);
-	void PrintMembers(const std::vector<UEProperty>& mem, std::vector<Member> outMembers);
 
 	void GenerateMembers(const std::vector<UEProperty>&, const UEStruct& super, std::vector<Member>& outMembers);
 	Function GenerateFunction(const UEFunction& function, const UEStruct& super);

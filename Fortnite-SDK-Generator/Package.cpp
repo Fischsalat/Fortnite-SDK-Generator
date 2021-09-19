@@ -1,6 +1,7 @@
 #pragma once
 #include "Package.h"
 #include "ObjectStore.h"
+#include "Generator.h"
 
 bool CompareProperties(UEProperty left, UEProperty right)
 {
@@ -11,23 +12,23 @@ bool CompareProperties(UEProperty left, UEProperty right)
 	return left.GetOffset() < right.GetOffset();
 }
 
-void Package::Process(UEObject object)
+void Package::Process()
 {
 	for (auto obj : UEObjectStore())
 	{
-		if (object.GetPackage() == packageObj)
+		if (obj.GetPackage() == packageObj)
 		{
-			if (object.IsA(UEEnum::StaticClass()))
+			if (obj.IsA(UEEnum::StaticClass()))
 			{
-				GenerateEnumClass(UEEnum(object.GetUObject()));
+				GenerateEnumClass(UEEnum(obj.GetUObject()));
 			}
-			else if (object.IsA(UEStruct::StaticClass()))
+			else if (obj.IsA(UEClass::StaticClass()))
 			{
-				GenerateScritStruct(UEStruct(object.GetUObject()));
+				GenerateClass(UEClass(obj.GetUObject()));
 			}
-			else if (object.IsA(UEClass::StaticClass()))
+			else if (obj.IsA(UEStruct::StaticClass()))
 			{
-				GenerateClass(UEClass(object.GetUObject()));
+				GenerateScritStruct(UEStruct(obj.GetUObject()));
 			}
 		}
 	}
@@ -105,21 +106,21 @@ Package::Function Package::GenerateFunction(const UEFunction& function, const UE
 
 	for (UEProperty childParam = function.GetChildren().Cast<UEProperty>(); childParam.IsValid(); childParam = childParam.GetNext().Cast<UEProperty>())
 	{
-		Package::Function::Parameter param;
+		Function::Parameter param;
 
 		param.bIsConst = childParam.HasFlag(EPropertyFlags::ConstParm) ? true : false;
 		param.bIsReference = childParam.HasFlag(EPropertyFlags::ReferenceParm) ? true : false;
 
 		if (childParam.HasFlag(EPropertyFlags::ReturnParm))
 		{
-			param.paramType = Package::Function::Parameter::ParameterType::Return;
+			param.paramType = Function::Parameter::ParameterType::Return;
 			func.bHasReturnValue = true;
 			func.returnType = childParam.GetPropertyType().second;
 		}
 		else if (childParam.HasFlag(EPropertyFlags::OutParm))
-			param.paramType = Package::Function::Parameter::ParameterType::Out;
+			param.paramType = Function::Parameter::ParameterType::Out;
 		else
-			param.paramType = Package::Function::Parameter::ParameterType::Normal;
+			param.paramType = Function::Parameter::ParameterType::Normal;
 		
 
 		if (param.bIsConst)
@@ -136,6 +137,10 @@ Package::Function Package::GenerateFunction(const UEFunction& function, const UE
 
 		func.params.emplace_back(std::move(param));
 	}
+
+	allFunctions.emplace_back(std::move(func));
+
+	return func;
 }
 
 Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
@@ -162,6 +167,7 @@ Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 	{
 		str.cppFullName = std::format("struct {} : public {}", str.cppName, super.GetCppName());
 		str.inheritedSize = super.GetStructSize();
+		// case of UObject being super = sizeof(UObject) since UObject is not a UStruct (has no structSize member)
 	}
 	else
 	{
@@ -183,6 +189,7 @@ Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 
 	GenerateMembers(propertyMembers, strct, str.members);
 
+	allStructs.push_back(str);
 	return str;
 }
 
@@ -228,12 +235,16 @@ Package::Class Package::GenerateClass(const UEClass& clss)
 			propertyMembers.push_back(fild.Cast<UEProperty>());
 		}
 		else if (fild.IsA(UEFunction::StaticClass()))
+		{
 			cls.functions.emplace_back(GenerateFunction(UEFunction(fild.GetUObject()), clss));
+		}
+			
 	}
 	std::sort(std::begin(propertyMembers), std::end(propertyMembers), CompareProperties);
 
 	GenerateMembers(propertyMembers, clss, cls.members);
 
+	allClasses.push_back(cls);
 	return cls;
 }
 
@@ -249,6 +260,7 @@ Package::Enum Package::GenerateEnumClass(const UEEnum& enm)
 	enumStruct.members = enm.GetAllNames();
 	enumStruct.underlayingType = "uint8";
 
+	allEnums.push_back(enumStruct);
 	return enumStruct;
 }
 

@@ -1,9 +1,29 @@
 #pragma once
 #include "Generator.h"
 
-
-void Generator::ProcessPackages(const fs::path& sdkPath)
+void Generator::Generate()
 {
+	genPath = fs::path(Settings::GetPath());
+
+	if (!genPath.is_absolute())
+	{
+
+	}
+
+	fs::create_directories(genPath);
+	fs::create_directories(genPath / "SDK");
+
+	std::vector<std::string> packageNames;
+	
+	ProcessPackages(genPath / "SDK", packageNames);
+
+	CreateSDKHeaderFile(genPath, packageNames);
+}
+
+void Generator::ProcessPackages(const fs::path& sdkPath, std::vector<std::string>& outNames)
+{
+	std::ofstream stream;
+	
 	std::vector<UEObject> packageObjects;
 	UEObjectStore::GetAllPackages(packageObjects);
 
@@ -11,7 +31,39 @@ void Generator::ProcessPackages(const fs::path& sdkPath)
 	{
 		Package pack(packageObj);
 
-		pack.Process(packageObj);
+		pack.Process();
+
+		GenerateStructsFile(stream, pack.allStructs, pack.allEnums, packageObj.GetName());
+		GenerateClassFile(stream, pack.allClasses, packageObj.GetName());
+		GenerateParameterFile(stream, pack.allFunctions, packageObj.GetName());
+		GenerateFunctionFile(stream, pack.allFunctions, packageObj.GetName());
+	}
+}
+
+void Generator::CreateSDKHeaderFile(const fs::path& sdkPath, const std::vector<std::string>& packageNames)
+{
+	std::ofstream stream(sdkPath / "SDK.hpp");
+}
+
+void Generator::SetStream(const fs::path&& sdkPath, std::ofstream& stream, FileType type, std::string packageName)
+{
+	switch (type)
+	{
+	case Generator::FileType::Parameter:
+		stream.open(sdkPath / (packageName + "_parameters.hpp"));
+		break;
+	case Generator::FileType::Function:
+		stream.open(sdkPath / (packageName + "_functions.cpp"));
+		break;
+	case Generator::FileType::Struct:
+		stream.open(sdkPath / (packageName + "_structs.hpp"));
+		break;
+	case Generator::FileType::Class:
+		stream.open(sdkPath / (packageName + "_classes.hpp"));
+		break;
+	default:
+		stream.open(sdkPath / (packageName + ".hpp"));
+		break;
 	}
 }
 
@@ -44,8 +96,10 @@ void Generator::PrintFileEnding(std::ofstream& stream, const Generator::FileType
 	stream << "#ifdef _MSC_VER\n\t#pragma pack(pop)\n#endif\n";
 }
 
-void Generator::GenerateStructsFile(std::ofstream& stream, const std::vector<Package::Struct>& structs, const std::vector<Package::Enum>& enums) const
+void Generator::GenerateStructsFile(std::ofstream& stream, const std::vector<Package::Struct>& structs, const std::vector<Package::Enum>& enums, std::string packageName) const
 {
+	SetStream(genPath / "SDK", stream, FileType::Struct, packageName);
+
 	PrintFileHeader(stream, FileType::Struct);
 
 	for (auto enumClass : enums)
@@ -87,21 +141,57 @@ void Generator::GenerateStructsFile(std::ofstream& stream, const std::vector<Pac
 	PrintFileEnding(stream, FileType::Struct);
 }
 
-void Generator::GenerateClassFile(std::ofstream& stream, const std::vector<Package::Class>& classes) const
+void Generator::GenerateClassFile(std::ofstream& stream, const std::vector<Package::Class>& classes, std::string packageName) const
 {
+	SetStream(genPath / "SDK", stream, FileType::Class, packageName);
+
 	PrintFileHeader(stream, FileType::Class);
 
 	for (auto clss : classes)
 	{
+		stream << std::format("//{}\n", clss.fullName);
 
+		if (clss.inheritedSize == 0)
+			stream << std::format("//0x{:04X}", clss.structSize);
+		else
+			stream << std::format("//0x{:04X} (0x{:04X} - 0x{:04X})", clss.structSize - clss.inheritedSize, clss.structSize, clss.inheritedSize);
+
+		stream << clss.cppFullName << "\n{\n";
+
+		for (auto member : clss.members)
+		{
+			stream << std::format("\t{:{}}{:{}}//", member.type, 50, member.name += ";", 100, member.comment);
+		}
+
+		stream << "\n\n\tstatic UClass* StaticClass()\n{";
+		stream << std::format("\tstatic auto ptr = UObject::FindClass(\"{}\");\n", clss.fullName);
+		stream << "}\n\n\n";
+
+		for (auto func : clss.functions)
+		{
+			stream << std::format("\t{} {}(", func.returnType, func.cppName);
+
+			for (int i = 0; i < func.params.size(); i++)
+			{
+				stream << func.params[i].typedName;
+
+				if (i != func.params.size() - 1)
+					stream << ", ";
+			}
+			stream << ");\n";
+		}
+
+		stream << "};\n\n\n";
 	}
 
 
 	PrintFileEnding(stream, FileType::Class);
 }
 
-void Generator::GenerateParameterFile(std::ofstream& stream, const std::vector<Package::Function>& parameters) const
+void Generator::GenerateParameterFile(std::ofstream& stream, const std::vector<Package::Function>& parameters, std::string packageName) const
 {
+	SetStream(genPath / "SDK", stream, FileType::Parameter, packageName);
+
 	PrintFileHeader(stream, FileType::Parameter);
 
 	for (auto parm : parameters)
@@ -127,8 +217,10 @@ void Generator::GenerateParameterFile(std::ofstream& stream, const std::vector<P
 	PrintFileEnding(stream, FileType::Parameter);
 }
 
-void Generator::GenerateFunctionFile(std::ofstream& stream, const std::vector<Package::Function>& functions) const
+void Generator::GenerateFunctionFile(std::ofstream& stream, const std::vector<Package::Function>& functions, std::string packageName) const
 {
+	SetStream(genPath / "SDK", stream, FileType::Function, packageName);
+
 	PrintFileHeader(stream, FileType::Function);
 
 	for (auto func : functions)
