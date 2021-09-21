@@ -78,7 +78,7 @@ void Generator::PrintFileHeader(std::ofstream& stream, const Generator::FileType
 	else if (ft == FileType::Function)
 		stream << "#include \"../SDK.h\"\n\n";
 
-	if (Settings::ShouldUseNamespaceForSDK)
+	if (Settings::ShouldUseNamespaceForSDK())
 		stream << "namespace " << Settings::GetSDKNamespace() << "\n{\n";
 
 	if (ft == FileType::Function && Settings::ShouldUseNamespaceForParams())
@@ -104,15 +104,22 @@ void Generator::GenerateStructsFile(std::ofstream& stream, const std::vector<Pac
 
 	for (auto enumClass : enums)
 	{
-		stream << std::format("//{}\nenum class {} : {}\n", enumClass.fullName, enumClass.name, enumClass.underlayingType);
+		stream << std::format("//{}\n{} : {}\n", enumClass.fullName, enumClass.name, enumClass.underlayingType);
 		stream << "{\n";
 
-		for (int i = 0; i < enumClass.members.size(); i++)
+		stream << "//DEBUG: count enums in enum class: " << enumClass.members.size() << "\n";
+
+		int count = 0;
+
+		for (auto enm : enumClass.members)
 		{
-			if (i != enumClass.members.size() - 1)
-				std::cout << std::format("\t{:{}} = {},", enumClass.members[i], 30);
-			else
-				std::cout << std::format("\t{:{}} = {}", enumClass.members[i], 30);
+			++count;
+			std::cout << std::format("\t{:{}} = {}", enm, 30, count);
+
+			if (count != enumClass.members.size())
+				stream << ",";
+
+			stream << "\n";
 		}
 		stream << "};\n\n\n";
 	}
@@ -128,14 +135,14 @@ void Generator::GenerateStructsFile(std::ofstream& stream, const std::vector<Pac
 		else
 			stream << std::format("//0x{:04X} (0x{:04X} - 0x{:04X})", scriptStruct.structSize - scriptStruct.inheritedSize, scriptStruct.structSize, scriptStruct.inheritedSize);
 		
-		stream << scriptStruct.cppFullName << "\n{\n";
+		stream << "\n" << scriptStruct.cppFullName << "\n{\n";
 
 		for (auto member : scriptStruct.members)
 		{
-			stream << std::format("\t{:{}}{:{}}//", member.type, 50, member.name += ";", 100, member.comment);
+			stream << std::format("\t{:{}}{:{}}//{}\n", member.type, 55, member.name += ";", 75, member.comment);
 		}
 		
-		stream << "};\n\n\n";
+		stream << "\n};\n\n\n";
 	}
 
 	PrintFileEnding(stream, FileType::Struct);
@@ -160,7 +167,7 @@ void Generator::GenerateClassFile(std::ofstream& stream, const std::vector<Packa
 
 		for (auto member : clss.members)
 		{
-			stream << std::format("\t{:{}}{:{}}//", member.type, 50, member.name += ";", 100, member.comment);
+			stream << std::format("\t{:{}}{:{}}//", member.type, 55, member.name += ";", 75, member.comment);
 		}
 
 		stream << "\n\n\tstatic UClass* StaticClass()\n{";
@@ -208,7 +215,7 @@ void Generator::GenerateParameterFile(std::ofstream& stream, const std::vector<P
 
 		for (auto member : parm.selfAsStruct.members)
 		{
-			stream << std::format("\t{:{}}{:{}}//{}({})", member.type, 50, member.name += ";", 100, member.offset, member.size);
+			stream << std::format("\t{:{}}{:{}}//{}({})", member.type, 55, member.name += ";", 75, member.offset, member.size);
 		}
 
 		stream << "};\n\n\n";

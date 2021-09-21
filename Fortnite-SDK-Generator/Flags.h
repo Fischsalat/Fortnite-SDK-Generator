@@ -94,7 +94,7 @@ enum class EFunctionFlags : uint32
 	Const							= 0x40000000,
 	NetValidate						= 0x80000000,
 
-	FUNC_AllFlags					= 0xFFFFFFFF,
+	AllFlags						= 0xFFFFFFFF,
 };
 
 inline bool operator&(EPropertyFlags left, EPropertyFlags right)

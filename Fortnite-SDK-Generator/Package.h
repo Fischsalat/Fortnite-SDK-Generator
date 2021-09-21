@@ -56,8 +56,8 @@ public:
 
 			bool bIsReference;
 			bool bIsConst;
-			std::string typedName; // const struct FString& URL
-			std::string nameOnly;
+			std::string typedName;	// const struct FString& URL
+			std::string nameOnly;	// URL
 
 			ParameterType paramType;
 		};

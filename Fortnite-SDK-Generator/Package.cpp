@@ -16,6 +16,14 @@ void Package::Process()
 {
 	for (auto obj : UEObjectStore())
 	{
+		if (!obj.IsValid() )
+			continue;
+
+		std::string name = obj.GetName();
+
+		if (name.find("Default__") != NPOS || name.find("Uninitialized") != NPOS || name.find("placeholder") != NPOS)
+			continue;
+
 		if (obj.GetPackage() == packageObj)
 		{
 			if (obj.IsA(UEEnum::StaticClass()))
@@ -67,7 +75,9 @@ void Package::GenerateMembers(const std::vector<UEProperty>& memberVector, const
 		int32 lastPropertyEnd = lastPropertyOffset + lastPropertySize;
 
 		if (mObj.offset > lastPropertyEnd)
+		{
 			outMembers.emplace_back(GenerateBytePadding(padCount, lastPropertyEnd, mObj.offset - lastPropertyEnd, "Fixing size after last property"));
+		}
 		
 		lastPropertyOffset = mObj.offset;
 		lastPropertySize = mObj.size;
@@ -98,7 +108,7 @@ Package::Function Package::GenerateFunction(const UEFunction& function, const UE
 	func.selfAsStruct = GenerateScritStruct(function); // UFunction : public UStruct
 
 	func.cppName = function.GetCppName();
-	func.superName = function.GetSuper().GetUniqueName();
+	func.superName = super.GetName();
 	func.parameterStructName = func.superName + "_" + func.cppName + "_" + "Params";
 	func.numParams = function.GetNumParams();
 	func.bHasReturnValue = false;
@@ -150,9 +160,6 @@ Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 
 	std::string structName = strct.GetUniqueName();
 
-	if (structName.find("Default__") != NPOS || structName.find("Uninitialized") != NPOS || structName.find("placeholder") != NPOS)
-		return Package::Struct();
-
 
 	Package::Struct str;
 
@@ -167,13 +174,15 @@ Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 	{
 		str.cppFullName = std::format("struct {} : public {}", str.cppName, super.GetCppName());
 		str.inheritedSize = super.GetStructSize();
-		// case of UObject being super = sizeof(UObject) since UObject is not a UStruct (has no structSize member)
 	}
 	else
 	{
 		str.cppFullName = std::format("struct {}", str.cppName);
 	}
 	str.structSize = strct.GetStructSize();
+
+	int32 possibleSizeFix = 0;
+	int32 offsetForPad = 0;
 
 	std::vector<UEProperty> propertyMembers;
 	for (UEProperty prop = strct.GetChildren().Cast<UEProperty>(); prop.IsValid(); prop = prop.GetNext().Cast<UEProperty>())
@@ -184,10 +193,23 @@ Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 		{
 			propertyMembers.push_back(prop);
 		}
+		if (!prop.GetNext().IsValid())
+		{
+			if ((prop.GetOffset() + prop.GetElementSize()) == str.structSize)
+			{
+				offsetForPad = prop.GetOffset() + prop.GetElementSize();
+				possibleSizeFix = str.structSize - offsetForPad;
+			}
+		}
 	}
 	std::sort(std::begin(propertyMembers), std::end(propertyMembers), CompareProperties);
 
 	GenerateMembers(propertyMembers, strct, str.members);
+
+	if (possibleSizeFix > 0)
+	{
+		str.members.push_back(GenerateBytePadding(rand(), offsetForPad, possibleSizeFix, "FIXING SIZE"));
+	}
 
 	allStructs.push_back(str);
 	return str;
@@ -221,7 +243,7 @@ Package::Class Package::GenerateClass(const UEClass& clss)
 	}
 	else
 	{
-		cls.cppFullName = std::format("struct {}", cls.cppName);
+		cls.cppFullName = std::format("class {}", cls.cppName);
 	}
 	cls.structSize = clss.GetStructSize();
 
@@ -241,7 +263,7 @@ Package::Class Package::GenerateClass(const UEClass& clss)
 			
 	}
 	std::sort(std::begin(propertyMembers), std::end(propertyMembers), CompareProperties);
-
+	
 	GenerateMembers(propertyMembers, clss, cls.members);
 
 	allClasses.push_back(cls);
@@ -268,7 +290,7 @@ Package::Enum Package::GenerateEnumClass(const UEEnum& enm)
 Package::Member Package::GenerateBytePadding(int32 id, int32 offset, int32 padSize, std::string reason)
 {
 	Member padMember;
-	padMember.name = std::format("UnknownData%02d[0x%X]", id, padSize);
+	padMember.name = std::format("UnknownData{:02d}[0x{:X}]", id, padSize);
 	padMember.type = "uint8";
 	padMember.size = padSize;
 	padMember.offset = offset;

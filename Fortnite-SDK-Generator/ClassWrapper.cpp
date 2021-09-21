@@ -344,7 +344,7 @@ UEProperty UE_ArrayProperty::GetInnerProperty() const
 //----------------------------------------
 std::string UE_ArrayProperty::GetTypeStr() const
 {
-	return std::format("TArray<{}>", GetInnerProperty().GetPropertyType().second);
+	return std::format("struct TArray<{}>", GetInnerProperty().GetPropertyType().second);
 }
 //-----------------------------------------------
 UEClass UE_ArrayProperty::StaticClass()

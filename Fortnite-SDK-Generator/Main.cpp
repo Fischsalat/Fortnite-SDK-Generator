@@ -13,6 +13,8 @@
 //Knows bugs:
 /*
 * Wrong size for structs
+* Enums don't have members
+* Struct layout
 */
 
 
