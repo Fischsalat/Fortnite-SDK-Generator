@@ -12,10 +12,11 @@
 
 //Knows bugs:
 /*
-* Wrong size for structs
-* Enums don't have members
-* Struct layout
+* Generator::SetStream() doesn't work properly so it only generates a single file
+*
 */
+
+
 
 
 DWORD WINAPI Main(LPVOID lpParam)
@@ -35,6 +36,20 @@ DWORD WINAPI Main(LPVOID lpParam)
 
 	sdkGen.Generate();
 
+
+	/*
+	for (auto obj : UEObjectStore())
+	{
+		if (!obj.IsValid())
+			continue;
+
+		if (obj.GetName().find("Default__") == NPOS && obj.IsA(UEEnum::StaticClass()))
+		{
+			
+		}
+			
+
+	}*/
 	
 	std::cout << "nfi" << std::endl;
 	

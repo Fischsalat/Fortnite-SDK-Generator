@@ -301,7 +301,7 @@ public:
 	int32 hashNextIdOffset;
 	int32 hashIndexOffset;
 	int32 setSize;
-	int32 MoreElementOffset;
+	int32 moreElementOffset;
 	int32 alignment;
 	int32 anotherSetSize;
 	int32 padInt32;
@@ -342,22 +342,22 @@ public:
 
 };
 
-template<typename ObjectType>
-class TWeakObjectPtr
+
+class FWeakObjectPtr
 {
 	int32		objectIndex;
 	int32		objectSerialNumber;
 
 public:
-	inline bool operator==(TWeakObjectPtr other)
+	inline bool operator==(FWeakObjectPtr other)
 	{
 		return objectIndex == other.objectIndex && objectSerialNumber == other.objectSerialNumber;
 	}
-	inline bool operator!=(TWeakObjectPtr other)
+	inline bool operator!=(FWeakObjectPtr other)
 	{
 		return objectIndex != other.objectIndex || objectSerialNumber != other.objectSerialNumber;
 	}
-	inline TWeakObjectPtr& operator=(TWeakObjectPtr other)
+	inline FWeakObjectPtr& operator=(FWeakObjectPtr other)
 	{
 		objectIndex = other.objectIndex;
 		objectSerialNumber = other.objectSerialNumber;
@@ -367,18 +367,26 @@ public:
 	{
 		return GObjects->ByIndex(objectIndex);
 	}
-	inline ObjectType* GetObjectCastet() const
-	{
-		return static_cast<ObjectType*>(GObjects->ByIndex(objectIndex));
-	}
+};
 
+template<typename ObjectType, class TWeakObjectPtrBase = FWeakObjectPtr>
+class TWeakObjectPtr : public TWeakObjectPtrBase
+{
+	inline UObject* Get() const
+	{
+		return TWeakObjectPtrBase::GetUObject();
+	}
+	inline ObjectType* GetCastet() const
+	{
+		return static_cast<ObjectType*>(Get());
+	}
 	inline UObject* operator*()
 	{
-		return GetUObject();
+		return Get();
 	}
 	inline UObject* operator->()
 	{
-		return GetUObject();
+		return Get();
 	}
 };
 

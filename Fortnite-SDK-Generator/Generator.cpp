@@ -22,7 +22,6 @@ void Generator::Generate()
 
 void Generator::ProcessPackages(const fs::path& sdkPath, std::vector<std::string>& outNames)
 {
-	std::ofstream stream;
 	
 	std::vector<UEObject> packageObjects;
 	UEObjectStore::GetAllPackages(packageObjects);
@@ -33,10 +32,13 @@ void Generator::ProcessPackages(const fs::path& sdkPath, std::vector<std::string
 
 		pack.Process();
 
-		GenerateStructsFile(stream, pack.allStructs, pack.allEnums, packageObj.GetName());
+		std::ofstream stream;
 		GenerateClassFile(stream, pack.allClasses, packageObj.GetName());
+		GenerateStructsFile(stream, pack.allStructs, pack.allEnums, packageObj.GetName());
 		GenerateParameterFile(stream, pack.allFunctions, packageObj.GetName());
 		GenerateFunctionFile(stream, pack.allFunctions, packageObj.GetName());
+
+		stream.flush();
 	}
 }
 
@@ -80,6 +82,19 @@ void Generator::PrintFileHeader(std::ofstream& stream, const Generator::FileType
 
 	if (Settings::ShouldUseNamespaceForSDK())
 		stream << "namespace " << Settings::GetSDKNamespace() << "\n{\n";
+	
+	stream << R"(
+typedef __int8 int8;
+typedef __int16 int16;
+typedef __int32 int32;
+typedef __int64 int64;
+
+typedef unsigned __int8 uint8;
+typedef unsigned __int16 uint16;
+typedef unsigned __int32 uint32;
+typedef unsigned __int64 uint64;
+
+)";
 
 	if (ft == FileType::Function && Settings::ShouldUseNamespaceForParams())
 		stream << "namespace " << Settings::GetParamNamespace() << "\n{\n";	
@@ -107,15 +122,13 @@ void Generator::GenerateStructsFile(std::ofstream& stream, const std::vector<Pac
 		stream << std::format("//{}\n{} : {}\n", enumClass.fullName, enumClass.name, enumClass.underlayingType);
 		stream << "{\n";
 
-		stream << "//DEBUG: count enums in enum class: " << enumClass.members.size() << "\n";
-
 		int count = 0;
 
-		for (auto enm : enumClass.members)
+		for (auto enmStr : enumClass.members)
 		{
+			
+			stream << std::format("\t{:{}} = {}", enmStr, 30, count);
 			++count;
-			std::cout << std::format("\t{:{}} = {}", enm, 30, count);
-
 			if (count != enumClass.members.size())
 				stream << ",";
 
@@ -124,10 +137,14 @@ void Generator::GenerateStructsFile(std::ofstream& stream, const std::vector<Pac
 		stream << "};\n\n\n";
 	}
 
-	stream << "\n\n";
+	stream << "\n" << std::endl;
 
 	for (auto scriptStruct : structs)
 	{
+		if (scriptStruct.cppName == "FInt32Range")
+			std::cout << "pause" << std::endl;
+
+
 		stream << std::format("//{}\n", scriptStruct.fullName);
 
 		if (scriptStruct.inheritedSize == 0)
@@ -142,10 +159,12 @@ void Generator::GenerateStructsFile(std::ofstream& stream, const std::vector<Pac
 			stream << std::format("\t{:{}}{:{}}//{}\n", member.type, 55, member.name += ";", 75, member.comment);
 		}
 		
-		stream << "\n};\n\n\n";
+		stream << "};\n\n" << std::endl;
 	}
 
 	PrintFileEnding(stream, FileType::Struct);
+
+	stream.flush();
 }
 
 void Generator::GenerateClassFile(std::ofstream& stream, const std::vector<Package::Class>& classes, std::string packageName) const
@@ -159,20 +178,20 @@ void Generator::GenerateClassFile(std::ofstream& stream, const std::vector<Packa
 		stream << std::format("//{}\n", clss.fullName);
 
 		if (clss.inheritedSize == 0)
-			stream << std::format("//0x{:04X}", clss.structSize);
+			stream << std::format("//0x{:04X}\n", clss.structSize);
 		else
-			stream << std::format("//0x{:04X} (0x{:04X} - 0x{:04X})", clss.structSize - clss.inheritedSize, clss.structSize, clss.inheritedSize);
+			stream << std::format("//0x{:04X} (0x{:04X} - 0x{:04X})\n", clss.structSize - clss.inheritedSize, clss.structSize, clss.inheritedSize);
 
-		stream << clss.cppFullName << "\n{\n";
+		stream << clss.cppFullName << "\n{\npublic:\n";
 
 		for (auto member : clss.members)
 		{
 			stream << std::format("\t{:{}}{:{}}//", member.type, 55, member.name += ";", 75, member.comment);
 		}
 
-		stream << "\n\n\tstatic UClass* StaticClass()\n{";
-		stream << std::format("\tstatic auto ptr = UObject::FindClass(\"{}\");\n", clss.fullName);
-		stream << "}\n\n\n";
+		stream << "\n\n\tstatic UClass* StaticClass()\n\t{";
+		stream << std::format("\n\t\tstatic auto ptr = UObject::FindClass(\"{}\");\n\t\treturn ptr;\n", clss.fullName);
+		stream << "\t}\n\n\n";
 
 		for (auto func : clss.functions)
 		{
@@ -188,11 +207,13 @@ void Generator::GenerateClassFile(std::ofstream& stream, const std::vector<Packa
 			stream << ");\n";
 		}
 
-		stream << "};\n\n\n";
+		stream << "};\n\n" << std::endl;
 	}
 
 
 	PrintFileEnding(stream, FileType::Class);
+
+	stream.flush();
 }
 
 void Generator::GenerateParameterFile(std::ofstream& stream, const std::vector<Package::Function>& parameters, std::string packageName) const
@@ -218,10 +239,12 @@ void Generator::GenerateParameterFile(std::ofstream& stream, const std::vector<P
 			stream << std::format("\t{:{}}{:{}}//{}({})", member.type, 55, member.name += ";", 75, member.offset, member.size);
 		}
 
-		stream << "};\n\n\n";
+		stream << "};\n\n" << std::endl;
 	}
 
 	PrintFileEnding(stream, FileType::Parameter);
+
+	stream.flush();
 }
 
 void Generator::GenerateFunctionFile(std::ofstream& stream, const std::vector<Package::Function>& functions, std::string packageName) const
@@ -285,8 +308,10 @@ void Generator::GenerateFunctionFile(std::ofstream& stream, const std::vector<Pa
 			stream << "\treturn parms.ReturnValue;";
 		}
 			
-		stream << "\n}";
+		stream << "\n}\n" << std::endl;
 	}
 
 	PrintFileEnding(stream, FileType::Function);
+
+	stream.flush();
 }

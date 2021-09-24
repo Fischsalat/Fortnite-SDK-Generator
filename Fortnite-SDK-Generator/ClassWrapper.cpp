@@ -210,12 +210,7 @@ UEClass UEEnum::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UEStruct::GetUniqueName() const
 {
-	std::string name;
-
-	if (UEObjectStore::CountObjects(UEStruct::StaticClass(), GetName()) > 1)
-		name += GetCppName() + "_" + std::to_string(GetFName().number);
-	else
-		return name += GetCppName();
+	return UEObjectStore::CountObjects(UEStruct::StaticClass(), GetName()) > 1 ? GetOuter().GetCppName() + "_" + GetCppName() : GetCppName();
 }
 //----------------------------------------
 UEStruct UEStruct::GetSuper() const

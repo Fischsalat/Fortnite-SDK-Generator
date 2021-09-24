@@ -158,13 +158,13 @@ Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 	if (!strct.IsValid())
 		return Package::Struct();
 
-	std::string structName = strct.GetUniqueName();
-
+	if (strct.GetFullName() == "Function FortniteGame.AIHotSpotSlot.OnStateChanged")
+		std::cout << "pause\n";
 
 	Package::Struct str;
 
 	str.fullName = strct.GetFullName();
-	str.cppName = structName;
+	str.cppName = strct.GetUniqueName();
 	str.inheritedSize = 0;
 	str.structSize = 0;
 	
@@ -210,6 +210,7 @@ Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 	{
 		str.members.push_back(GenerateBytePadding(rand(), offsetForPad, possibleSizeFix, "FIXING SIZE"));
 	}
+	
 
 	allStructs.push_back(str);
 	return str;
@@ -224,8 +225,6 @@ Package::Class Package::GenerateClass(const UEClass& clss)
 
 	if (className.find("Default__") != NPOS || className.find("Uninitialized") != NPOS || className.find("placeholder") != NPOS)
 		return Package::Class();
-
-
 
 	Package::Class cls;
 
