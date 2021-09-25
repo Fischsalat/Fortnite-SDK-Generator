@@ -339,7 +339,7 @@ UEProperty UE_ArrayProperty::GetInnerProperty() const
 //----------------------------------------
 std::string UE_ArrayProperty::GetTypeStr() const
 {
-	return std::format("struct TArray<{}>", GetInnerProperty().GetPropertyType().second);
+	return std::format("struct TArray<{}>", GetInnerProperty().GetPropertyType());
 }
 //-----------------------------------------------
 UEClass UE_ArrayProperty::StaticClass()
@@ -436,7 +436,7 @@ UEClass UE_NameProperty::StaticClass()
 }
 // UE_EnumProperty
 //-----------------------------------------------------------------------------------------------
-std::pair<PropertyType, std::string> UE_EnumProperty::GetUnerlyingType() const
+std::string UE_EnumProperty::GetUnerlyingType() const
 {
 	return UEProperty(static_cast<UEnumProperty*>(object)->underlayingType).GetPropertyType();
 }
@@ -480,7 +480,7 @@ int32 UE_SetProperty::GetAlignmet() const
 //----------------------------------------
 std::string UE_SetProperty::GetTypeStr() const
 {
-	return std::format("TSet<{}>", GetElementProperty().GetPropertyType().second);
+	return std::format("TSet<{}>", GetElementProperty().GetPropertyType());
 }
 //-----------------------------------------------
 UEClass UE_SetProperty::StaticClass()
@@ -527,7 +527,7 @@ int32 UE_MapProperty::GetAlignmet() const
 //----------------------------------------
 std::string UE_MapProperty::GetTypeStr() const
 {
-	return std::format("TMap<{}, {}>", GetKeyProperty().GetPropertyType().second, GetValueProperty().GetPropertyType().second);
+	return std::format("TMap<{}, {}>", GetKeyProperty().GetPropertyType(), GetValueProperty().GetPropertyType());
 }
 //-----------------------------------------------
 UEClass UE_MapProperty::StaticClass()
@@ -610,7 +610,7 @@ bool UE_boolProperty::IsBitField() const
 //----------------------------------------
 std::string UE_boolProperty::GetTypeStr() const
 {
-	return IsNormalBool() ? "bool" : "uint8";
+	return IsNormalBool() ? "bool" : "uint8_t";
 }
 //-----------------------------------------------
 UEClass UE_boolProperty::StaticClass()
@@ -637,7 +637,7 @@ std::string UE_byteProperty::GetTypeStr() const
 	if (GetEnum().IsValid())
 		return GetEnum().GetEnumTypeAsStr();
 	else
-		return "uint8";
+		return "uint8_t";
 }
 //-----------------------------------------------
 UEClass UE_byteProperty::StaticClass()
@@ -648,7 +648,7 @@ UEClass UE_byteProperty::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_uint16Property::GetTypeStr() const
 {
-	return "uint16";
+	return "uint16_t";
 }
 //-----------------------------------------------
 UEClass UE_uint16Property::StaticClass()
@@ -659,7 +659,7 @@ UEClass UE_uint16Property::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_uint32Property::GetTypeStr() const
 {
-	return "uint32";
+	return "uint32_t";
 }
 //-----------------------------------------------
 UEClass UE_uint32Property::StaticClass()
@@ -670,7 +670,7 @@ UEClass UE_uint32Property::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_uint64Property::GetTypeStr() const
 {
-	return "uint64";
+	return "uint64_t";
 }
 //-----------------------------------------------
 UEClass UE_uint64Property::StaticClass()
@@ -681,7 +681,7 @@ UEClass UE_uint64Property::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_int8Property::GetTypeStr() const
 {
-	return "int8";
+	return "int8_t";
 }
 //-----------------------------------------------
 UEClass UE_int8Property::StaticClass()
@@ -692,7 +692,7 @@ UEClass UE_int8Property::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_int16Property::GetTypeStr() const
 {
-	return "int16";
+	return "int16_t";
 }
 //-----------------------------------------------
 UEClass UE_int16Property::StaticClass()
@@ -703,7 +703,7 @@ UEClass UE_int16Property::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_intProperty::GetTypeStr() const
 {
-	return "int32";
+	return "int32_t";
 }
 //-----------------------------------------------
 UEClass UE_intProperty::StaticClass()
@@ -714,7 +714,7 @@ UEClass UE_intProperty::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_int64Property::GetTypeStr() const
 {
-	return "int64";
+	return "int64_t";
 }
 //-----------------------------------------------
 UEClass UE_int64Property::StaticClass()
@@ -760,32 +760,31 @@ UEClass UEActor::StaticClass()
 	return staticClass;
 }
 
-std::pair<PropertyType, std::string> UEProperty::GetPropertyType() const
+std::string UEProperty::GetPropertyType() const
 {
-	if (IsA<UE_byteProperty>()) { return { PropertyType::ByteProperty, Cast<UE_byteProperty>().GetTypeStr() }; };
-	if (IsA<UE_doubleProperty>()) { return { PropertyType::DoubleProperty,Cast<UE_doubleProperty>().GetTypeStr() }; };
-	if (IsA<UE_floatProperty>()) { return { PropertyType::FloatProperty, Cast<UE_floatProperty>().GetTypeStr() }; };
-	if (IsA<UE_intProperty>()) { return { PropertyType::IntProperty, Cast<UE_intProperty>().GetTypeStr() }; };
-	if (IsA<UE_int16Property>()) { return { PropertyType::Int16Property,Cast<UE_int16Property>().GetTypeStr() }; };
-	if (IsA<UE_int64Property>()) { return { PropertyType::Int64Property, Cast<UE_int64Property>().GetTypeStr() }; };
-	if (IsA<UE_int8Property>()) { return { PropertyType::Int8Property, Cast<UE_int8Property>().GetTypeStr() }; };
-	if (IsA<UE_uint16Property>()) { return { PropertyType::UInt16Property, Cast<UE_uint16Property>().GetTypeStr() }; };
-	if (IsA<UE_uint32Property>()) { return { PropertyType::UInt32Property, Cast<UE_uint32Property>().GetTypeStr() }; }
-	if (IsA<UE_uint64Property>()) { return { PropertyType::UInt64Property, Cast<UE_uint64Property>().GetTypeStr() }; };
-	if (IsA<UE_TextProperty>()) { return { PropertyType::TextProperty, Cast<UE_TextProperty>().GetTypeStr() }; }
-	if (IsA<UE_StrProperty>()) { return { PropertyType::TextProperty, Cast<UE_StrProperty>().GetTypeStr() }; };
-	if (IsA<UE_ClassProperty>()) { return { PropertyType::ClassProperty, Cast<UE_ClassProperty>().GetTypeStr() }; };
-	if (IsA<UE_StructProperty>()) { return { PropertyType::StructProperty, Cast<UE_StructProperty>().GetTypeStr() }; };
-	if (IsA<UE_NameProperty>()) { return { PropertyType::NameProperty, Cast<UE_NameProperty>().GetTypeStr() }; };
-	if (IsA<UE_boolProperty>()) { return { PropertyType::BoolProperty, Cast<UE_boolProperty>().GetTypeStr() }; }
-	if (IsA<UE_ArrayProperty>()) { return { PropertyType::ArrayProperty, Cast<UE_ArrayProperty>().GetTypeStr() }; };
-	if (IsA<UE_EnumProperty>()) { return { PropertyType::EnumProperty, Cast<UE_EnumProperty>().GetTypeStr() }; };
-	if (IsA<UE_SetProperty>()) { return { PropertyType::SetProperty, Cast<UE_SetProperty>().GetTypeStr() }; };
-	if (IsA<UE_MapProperty>()) { return { PropertyType::MapProperty, Cast<UE_MapProperty>().GetTypeStr() }; };
-	if (IsA<UE_InterfaceProperty>()) { return { PropertyType::InterfaceProperty, Cast<UE_InterfaceProperty>().GetTypeStr() }; };
-	if (IsA<UE_MulticastDelegateProperty>()) { return { PropertyType::MulticastDelegateProperty, Cast<UE_MulticastDelegateProperty>().GetTypeStr() }; };
-	if (IsA<UE_WeakObjectProperty>()) { return { PropertyType::WeakObjectProperty, Cast<UE_WeakObjectProperty>().GetTypeStr() }; };
-	if (IsA<UE_ObjectProperty>()) { return { PropertyType::ObjectProperty, Cast<UE_ObjectProperty>().GetTypeStr() }; };
-	if (IsA<UE_ObjectProperty>()) { return { PropertyType::Unknown, Cast<UEProperty>().GetName() }; };
-	return { PropertyType::Unknown, GetClass().GetName() };
+	if (IsA<UE_byteProperty>()) { return Cast<UE_byteProperty>().GetTypeStr(); };
+	if (IsA<UE_doubleProperty>()) { return Cast<UE_doubleProperty>().GetTypeStr(); };
+	if (IsA<UE_floatProperty>()) { return Cast<UE_floatProperty>().GetTypeStr(); };
+	if (IsA<UE_int8Property>()) { return Cast<UE_int8Property>().GetTypeStr(); };
+	if (IsA<UE_int16Property>()) { return Cast<UE_int16Property>().GetTypeStr(); };
+	if (IsA<UE_intProperty>()) { return Cast<UE_intProperty>().GetTypeStr(); };
+	if (IsA<UE_int64Property>()) { return Cast<UE_int64Property>().GetTypeStr(); };
+	if (IsA<UE_uint16Property>()) { return Cast<UE_uint16Property>().GetTypeStr(); };
+	if (IsA<UE_uint32Property>()) { return Cast<UE_uint32Property>().GetTypeStr(); };
+	if (IsA<UE_uint64Property>()) { return Cast<UE_uint64Property>().GetTypeStr(); };
+	if (IsA<UE_TextProperty>()) { return Cast<UE_TextProperty>().GetTypeStr(); };
+	if (IsA<UE_StrProperty>()) { return Cast<UE_StrProperty>().GetTypeStr(); };
+	if (IsA<UE_ClassProperty>()) { return Cast<UE_ClassProperty>().GetTypeStr(); };
+	if (IsA<UE_StructProperty>()) { return Cast<UE_StructProperty>().GetTypeStr(); };
+	if (IsA<UE_NameProperty>()) { return Cast<UE_NameProperty>().GetTypeStr(); };
+	if (IsA<UE_boolProperty>()) { return Cast<UE_boolProperty>().GetTypeStr(); };
+	if (IsA<UE_ArrayProperty>()) { return Cast<UE_ArrayProperty>().GetTypeStr(); };
+	if (IsA<UE_EnumProperty>()) { return Cast<UE_EnumProperty>().GetTypeStr(); };
+	if (IsA<UE_SetProperty>()) { return Cast<UE_SetProperty>().GetTypeStr(); };
+	if (IsA<UE_MapProperty>()) { return Cast<UE_MapProperty>().GetTypeStr(); };
+	if (IsA<UE_InterfaceProperty>()) { return Cast<UE_InterfaceProperty>().GetTypeStr(); };
+	if (IsA<UE_MulticastDelegateProperty>()) { return Cast<UE_MulticastDelegateProperty>().GetTypeStr(); };
+	if (IsA<UE_WeakObjectProperty>()) { return Cast<UE_WeakObjectProperty>().GetTypeStr(); };
+	if (IsA<UE_ObjectProperty>()) { return Cast<UE_ObjectProperty>().GetTypeStr(); };
+	return GetClass().GetName() ;
 }

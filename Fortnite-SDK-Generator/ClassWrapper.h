@@ -129,7 +129,7 @@ public:
 
 	static UEClass StaticClass();
 
-	std::pair<enum class PropertyType, std::string> GetPropertyType() const;
+	std::string GetPropertyType() const;
 };
 
 class UE_ArrayProperty : public UEProperty
@@ -236,7 +236,7 @@ class UE_EnumProperty : public UEProperty
 public:
 	using UEProperty::UEProperty;
 
-	std::pair<PropertyType, std::string> GetUnerlyingType() const;
+	std::string GetUnerlyingType() const;
 	UEEnum GetEnum() const;
 
 	std::string GetTypeStr() const;

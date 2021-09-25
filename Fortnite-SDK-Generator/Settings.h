@@ -4,8 +4,6 @@
 
 namespace Settings
 {
-	
-	// It'll create a SDKGen folder in that path and a SDK folder below that
 	__forceinline const std::string GetPath()
 	{
 		return "C:/SDKGen";

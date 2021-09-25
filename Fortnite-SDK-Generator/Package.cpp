@@ -66,7 +66,7 @@ void Package::GenerateMembers(const std::vector<UEProperty>& memberVector, const
 			mObj.size = boolProp.GetElementSize();
 		}
 
-		mObj.type = member.GetPropertyType().second;
+		mObj.type = member.GetPropertyType();
 		mObj.name = member.GetCppName();
 		mObj.size = member.GetElementSize(); 
 		mObj.offset = member.GetOffset();
@@ -108,13 +108,14 @@ Package::Function Package::GenerateFunction(const UEFunction& function, const UE
 	func.selfAsStruct = GenerateScritStruct(function); // UFunction : public UStruct
 
 	func.cppName = function.GetCppName();
+	func.fullName = function.GetFullName();
 	func.superName = super.GetName();
 	func.parameterStructName = func.superName + "_" + func.cppName + "_" + "Params";
 	func.numParams = function.GetNumParams();
 	func.bHasReturnValue = false;
 	func.allFlags = function.GetFlagsAsString();
 
-	for (UEProperty childParam = function.GetChildren().Cast<UEProperty>(); childParam.IsValid(); childParam = childParam.GetNext().Cast<UEProperty>())
+	for (UEProperty childParam = UEProperty(function.GetChildren().GetUObject()); childParam.IsValid(); childParam = UEProperty(childParam.GetNext().GetUObject()))
 	{
 		Function::Parameter param;
 
@@ -125,7 +126,7 @@ Package::Function Package::GenerateFunction(const UEFunction& function, const UE
 		{
 			param.paramType = Function::Parameter::ParameterType::Return;
 			func.bHasReturnValue = true;
-			func.returnType = childParam.GetPropertyType().second;
+			func.returnType = childParam.GetPropertyType();
 		}
 		else if (childParam.HasFlag(EPropertyFlags::OutParm))
 			param.paramType = Function::Parameter::ParameterType::Out;
@@ -136,7 +137,7 @@ Package::Function Package::GenerateFunction(const UEFunction& function, const UE
 		if (param.bIsConst)
 			param.typedName += "const ";
 
-		param.typedName += childParam.GetPropertyType().second;
+		param.typedName += childParam.GetPropertyType();
 
 		if (param.bIsReference)
 			param.typedName += "&";
@@ -185,7 +186,7 @@ Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 	int32 offsetForPad = 0;
 
 	std::vector<UEProperty> propertyMembers;
-	for (UEProperty prop = strct.GetChildren().Cast<UEProperty>(); prop.IsValid(); prop = prop.GetNext().Cast<UEProperty>())
+	for (UEProperty prop = UEProperty(strct.GetChildren().GetUObject()); prop.IsValid(); prop = UEProperty(prop.GetNext().GetUObject()))
 	{
 		if(prop.GetElementSize() > 0 
 			&& prop.IsA(UEProperty::StaticClass())
@@ -250,10 +251,10 @@ Package::Class Package::GenerateClass(const UEClass& clss)
 	for (UEField fild = clss.GetChildren(); fild.IsValid(); fild = fild.GetNext())
 	{
 		if (fild.IsA(UEProperty::StaticClass())
-			&& !fild.Cast<UEProperty>().GetElementSize() > 0
-			&& (!super.IsValid() || (super != clss && fild.Cast<UEProperty>().GetOffset() >= super.GetStructSize())))
+			&& !UEProperty(fild.GetUObject()).GetElementSize() > 0
+			&& (!super.IsValid() || (super != clss && UEProperty(fild.GetUObject()).GetOffset() >= super.GetStructSize())))
 		{
-			propertyMembers.push_back(fild.Cast<UEProperty>());
+			propertyMembers.push_back(UEProperty(fild.GetUObject()));
 		}
 		else if (fild.IsA(UEFunction::StaticClass()))
 		{

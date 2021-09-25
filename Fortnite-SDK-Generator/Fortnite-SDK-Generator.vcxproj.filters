@@ -38,6 +38,9 @@
     <ClCompile Include="Generator.cpp">
       <Filter>Headerdateien\Generator</Filter>
     </ClCompile>
+    <ClCompile Include="Predefined.cpp">
+      <Filter>Headerdateien\Generator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CoreClasses.h">
@@ -66,6 +69,9 @@
     </ClInclude>
     <ClInclude Include="Settings.h">
       <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Predefined.h">
+      <Filter>Headerdateien\Generator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

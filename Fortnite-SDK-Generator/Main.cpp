@@ -9,15 +9,13 @@
 #include "ObjectStore.h"
 #include "Package.h"
 #include "Generator.h"
+#include "Predefined.h"
 
 //Knows bugs:
 /*
-* Generator::SetStream() doesn't work properly so it only generates a single file
+* Too much classess/structs in the FortniteGame package
 *
 */
-
-
-
 
 DWORD WINAPI Main(LPVOID lpParam)
 {
@@ -32,10 +30,10 @@ DWORD WINAPI Main(LPVOID lpParam)
 	
 	std::cout << std::format("Hello{:{}X}", 0xFF, 50) << "\n\n\n";
 
+	InitalizePredefinedMembers();
+
 	Generator sdkGen;
-
 	sdkGen.Generate();
-
 
 	/*
 	for (auto obj : UEObjectStore())

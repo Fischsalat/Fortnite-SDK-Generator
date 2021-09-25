@@ -107,4 +107,10 @@ private:
 	Member GenerateBytePadding(int32 id, int32 offset, int32 padSize, std::string reason);
 	Member GenerateBitPadding(); // fix later
 
+public:
+	inline bool IsEmpty()
+	{
+		return allEnums.empty() && allClasses.empty() && allStructs.empty() && allFunctions.empty();
+	}
+
 };
