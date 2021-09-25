@@ -2,5 +2,5 @@
 
 Unfinished SDK Generator for Fortnite 
 
-Currently supported version:
+Currently supported:
 1.2
