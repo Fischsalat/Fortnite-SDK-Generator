@@ -6,3 +6,6 @@ Currently supported (but not yet working):
 1.2
 
 I'm trying to get it to a usable state withing the next few weeks.
+
+
+Oh yea, btw. obviously based on KN4CK3Rs UnrealEngine-SDK-Generator.
