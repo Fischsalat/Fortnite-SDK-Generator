@@ -107,9 +107,9 @@ Package::Function Package::GenerateFunction(const UEFunction& function, const UE
 
 	func.selfAsStruct = GenerateScritStruct(function); // UFunction : public UStruct
 
-	func.cppName = function.GetCppName();
+	func.cppName = function.GetName();
 	func.fullName = function.GetFullName();
-	func.superName = super.GetName();
+	func.superName = super.GetUniqueName();
 	func.parameterStructName = func.superName + "_" + func.cppName + "_" + "Params";
 	func.numParams = function.GetNumParams();
 	func.bHasReturnValue = false;
@@ -146,10 +146,10 @@ Package::Function Package::GenerateFunction(const UEFunction& function, const UE
 
 		param.nameOnly = childParam.GetCppName();
 
-		func.params.emplace_back(std::move(param));
+		func.params.push_back(param);
 	}
 
-	allFunctions.emplace_back(std::move(func));
+	allFunctions.push_back(func);
 
 	return func;
 }

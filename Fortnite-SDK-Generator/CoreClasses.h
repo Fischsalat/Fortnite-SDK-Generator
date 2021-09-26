@@ -1,6 +1,7 @@
 #pragma once
 #include "Global.h"
 #include "Flags.h"
+#include "Flags.h"
 
 class UObject;
 

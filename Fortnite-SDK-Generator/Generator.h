@@ -7,9 +7,12 @@ class Generator
 private:
 	friend class Package;
 
-	fs::path genPath;
-
-private:
+	struct PredefinedMember
+	{
+		std::string type;
+		std::string name;
+		int32 size;
+	};
 	enum class FileType
 	{
 		Parameter,
@@ -18,7 +21,12 @@ private:
 		Class
 	};
 
+	static fs::path genPath;
+	static std::unordered_map<std::string, std::vector<Generator::PredefinedMember>> predefinedMembers;
+
 public:
+	Generator();
+
 	void Generate();
 
 private:
@@ -36,4 +44,3 @@ private:
 	void GenerateParameterFile(const std::vector<Package::Function>& parameters, std::string packageName) const;
 	void GenerateFunctionFile(const std::vector<Package::Function>& functions, std::string packageName) const;
 };
-

@@ -4,12 +4,9 @@
 // + Epic for the UE4 stuff
 #pragma once
 #include "Global.h"
-#include "CoreFunctions.h"
-#include "ClassWrapper.h"
 #include "ObjectStore.h"
 #include "Package.h"
 #include "Generator.h"
-#include "Predefined.h"
 
 //Knows bugs:
 /*
@@ -29,8 +26,6 @@ DWORD WINAPI Main(LPVOID lpParam)
 	std::cout << "search" << std::endl;
 	
 	std::cout << std::format("Hello{:{}X}", 0xFF, 50) << "\n\n\n";
-
-	InitalizePredefinedMembers();
 
 	Generator sdkGen;
 	sdkGen.Generate();

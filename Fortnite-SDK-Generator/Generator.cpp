@@ -1,6 +1,5 @@
 #pragma once
 #include "Generator.h"
-#include "Predefined.h"
 
 void Generator::Generate()
 {
@@ -180,35 +179,38 @@ void Generator::GenerateClassFile(const std::vector<Package::Class>& classes, st
 
 		stream << clss.cppFullName << "\n{\npublic:\n";
 
-
 		if (predefinedMembers.find(clss.fullName) != std::end(predefinedMembers))
 		{			
 			for (auto member : predefinedMembers[clss.fullName])
 			{
-				stream << std::format("\t{:{}{:{}}//({}) NOT AUTO-GENERATED PROPERTY\n", member.type, 55, member.name + ";", 75, member.size);
+				stream << std::format("\t{:{}}{:{}}//(0x{:02X}[{:02d}]) NOT AUTO-GENERATED PROPERTY\n", member.type, 50, member.name + ";", 75, member.size, member.size);
 			}
 		}
 		for (auto member : clss.members)
 		{
-			stream << std::format("\t{:{}}{:{}}//{}\n", member.type, 55, member.name += ";", 75, member.comment);
+			stream << std::format("\t{:{}}{:{}}//{}\n", member.type, 50, member.name += ";", 75, member.comment);
 		}
 
 		stream << "\n\tstatic UClass* StaticClass()\n\t{";
 		stream << std::format("\n\t\tstatic auto ptr = UObject::FindClass(\"{}\");\n\t\treturn ptr;\n", clss.fullName);
-		stream << "\t}\n\n\n";
+		stream << "\t}\n";
 
-		for (auto func : clss.functions)
+		if (!clss.functions.empty())
 		{
-			stream << std::format("\t{} {}(", func.returnType, func.cppName);
-
-			for (int i = 0; i < func.params.size(); i++)
+			stream << "\n";
+			for (auto func : clss.functions)
 			{
-				stream << func.params[i].typedName;
+				stream << std::format("\t{} {}(", func.returnType, func.cppName);
 
-				if (i != func.params.size() - 1)
-					stream << ", ";
+				for (int i = 0; i < func.params.size(); i++)
+				{
+					stream << func.params[i].typedName;
+
+					if (i != func.params.size() - 1)
+						stream << ", ";
+				}
+				stream << ");\n";
 			}
-			stream << ");\n";
 		}
 
 		stream << "};\n" << std::endl;
@@ -242,7 +244,7 @@ void Generator::GenerateParameterFile(const std::vector<Package::Function>& para
 
 		for (auto member : parm.selfAsStruct.members)
 		{
-			stream << std::format("\t{:{}}{:{}}//{}({})", member.type, 55, member.name += ";", 75, member.offset, member.size);
+			stream << std::format("\t{:{}}{:{}}//{}({})", member.type, 50, member.name += ";", 75, member.offset, member.size);
 		}
 
 		stream << "};\n" << std::endl;
@@ -323,3 +325,72 @@ void Generator::GenerateFunctionFile(const std::vector<Package::Function>& funct
 
 	stream.flush();
 }
+
+Generator::Generator()
+{
+	predefinedMembers["Class CoreUObject.Object"] =
+	{
+		{ "void*", "Vft", 0x08 },
+		{ "int32_t", "Flags", 0x04 },
+		{ "int32_t", "Index", 0x04 },
+		{ "class UClass*", "Class", 0x08 },
+		{ "class FName", "Name", 0x08},
+		{ "class UObject", "Outer", 0x08 }
+	};
+
+	predefinedMembers["Class CoreUObject.Field"] =
+	{
+		{ "class UField*", "Next", 0x08 },
+	};
+
+	predefinedMembers["Class CoreUObject.Enum"] =
+	{
+		{ "class FString", "CppType", 0x0C },
+		{ "TArray<TPari<FName, int64_t>>", "Names", 0x0C},
+		{ "int64_t", "CppForm", 0x08 },
+		{ "uint8_t", "Pad1[0x10]", 0x10 }
+	};
+
+	predefinedMembers["Class CoreUObject.Struct"] =
+	{
+		{ "class UStruct*", "Super", 0x08 },
+		{ "class UField*", "Children", 0x08 },
+		{ "int32_t", "PropertySize", 0x04 },
+		{ "int32_t", "MinAlignment", 0x04 },
+		{ "uint8_t", "Pad2[0x40]", 0x40 }
+	};
+
+	predefinedMembers["Class CoreUObject.Class"] =
+	{
+		{ "uint8_t", "Pad3[0x88]", 0x88 },
+		{ "class UObject*", "DefaultObject", 0x08 }
+	};
+
+	predefinedMembers["Class CoreUObject.Function"] =
+	{
+		{ "uint32_t", "FuncFlags", 0x04 },
+		{ "uint16_t", "RepOffset", 0x02 },
+		{ "int8_t", "NumberParams", 0x01 },
+		{ "int8_t", "Pad4[0x1]", 0x01 },
+		{ "int16_t", "SizeParams", 0x02 },
+		{ "int16_t", "OffsetReturnValue", 0x02 },
+		{ "uint8_t", "Pad5[0x1C]", 0x1C },
+		{ "void*", "Func", 0x8 }
+	};
+
+	predefinedMembers["Class CoreUObject.Property"] =
+	{
+		{ "uint32_t", "ArrayDim", 0x04 },
+		{ "uint32_t", "ElementSize", 0x04 },
+		{ "int8_t", "Pad6[0x10]", 0x10 },
+		{ "uint64_t", "PropertyFlags", 0x08 },
+		{ "uint32_t", "OffsetInternal", 0x04 },
+		{ "int8_t", "Pad7[0x04]", 0x04 },
+		{ "uint8_t", "Pad8[0x1C]", 0x1C },
+		{ "class UProperty*", "PropertyLinkNext", 0x8 },
+		{ "int8_t", "Pad9[0x18]", 0x18 }
+	};
+}
+
+fs::path Generator::genPath;
+std::unordered_map<std::string, std::vector<Generator::PredefinedMember>> Generator::predefinedMembers;
