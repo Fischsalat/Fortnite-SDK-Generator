@@ -12,7 +12,7 @@ bool CompareProperties(UEProperty left, UEProperty right)
 	return left.GetOffset() < right.GetOffset();
 }
 
-void Package::Process()
+void Package::Process(const class Generator& gen)
 {
 	for (auto obj : UEObjectStore())
 	{
@@ -21,24 +21,42 @@ void Package::Process()
 
 		std::string name = obj.GetName();
 
-		if (name.find("Default__") != NPOS || name.find("Uninitialized") != NPOS || name.find("placeholder") != NPOS)
+		if (name.find("Default__") != NPOS || name.find("Uninitialized") != NPOS || name.find("Placeholder") != NPOS)
 			continue;
 
+
 		if (obj.GetPackage() == packageObj)
-		{
+		{	/*
 			if (obj.IsA(UEEnum::StaticClass()))
 			{
 				GenerateEnumClass(UEEnum(obj.GetUObject()));
-			}
-			else if (obj.IsA(UEClass::StaticClass()))
+			}*/
+			/*else */ if (obj.IsA(UEClass::StaticClass()))
 			{
 				GenerateClass(UEClass(obj.GetUObject()));
-			}
+			}/*
 			else if (obj.IsA(UEStruct::StaticClass()))
 			{
 				GenerateScritStruct(UEStruct(obj.GetUObject()));
-			}
+			}*/
 		}
+
+		if (allClasses.size() >= 20 || allStructs.size() >= 40)
+		{
+			std::string packageName = packageObj.GetName();
+			gen.GenerateClassFile(allClasses, packageName, bPrintedBefore, false);
+			gen.GenerateStructsFile(allStructs, allEnums, packageName, bPrintedBefore, false);
+			gen.GenerateParameterFile(allFunctions, packageName, bPrintedBefore, false);
+			gen.GenerateFunctionFile(allFunctions, packageName, bPrintedBefore, false);
+
+			bPrintedBefore = true;
+
+			allFunctions.clear();
+			allClasses.clear();
+			allStructs.clear();
+			allEnums.clear();
+		}
+
 	}
 }
 
@@ -98,14 +116,17 @@ void Package::GenerateMembers(const std::vector<UEProperty>& memberVector, const
 	}
 }
 
-Package::Function Package::GenerateFunction(const UEFunction& function, const UEStruct& super)
+void Package::GenerateFunction(const UEFunction& function, const UEStruct& super, std::vector<Function>& outFunctions)
 {
-	if(!function.IsValid() || !super.IsValid())
-		return Package::Function();
+	if (!function.IsValid() || !super.IsValid())
+		return;
 
 	Package::Function func;
 
-	func.selfAsStruct = GenerateScritStruct(function); // UFunction : public UStruct
+	GenerateScritStruct(function); // UFunction : public UStruct
+
+
+	func.selfAsStruct = allStructs[allStructs.size() - 1];
 
 	func.cppName = function.GetName();
 	func.fullName = function.GetFullName();
@@ -150,17 +171,12 @@ Package::Function Package::GenerateFunction(const UEFunction& function, const UE
 	}
 
 	allFunctions.push_back(func);
-
-	return func;
 }
 
-Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
+void Package::GenerateScritStruct(const UEStruct& strct)
 {
 	if (!strct.IsValid())
-		return Package::Struct();
-
-	if (strct.GetFullName() == "Function FortniteGame.AIHotSpotSlot.OnStateChanged")
-		std::cout << "pause\n";
+		return;
 
 	Package::Struct str;
 
@@ -214,18 +230,17 @@ Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 	
 
 	allStructs.push_back(str);
-	return str;
 }
 
-Package::Class Package::GenerateClass(const UEClass& clss)
-{
+void Package::GenerateClass(const UEClass& clss)
+{/*
 	if (!clss.IsValid())
-		return Package::Class();
+		return;
 
 	std::string className = clss.GetUniqueName();
 
 	if (className.find("Default__") != NPOS || className.find("Uninitialized") != NPOS || className.find("placeholder") != NPOS)
-		return Package::Class();
+		return;
 
 	Package::Class cls;
 
@@ -247,6 +262,7 @@ Package::Class Package::GenerateClass(const UEClass& clss)
 	}
 	cls.structSize = clss.GetStructSize();
 
+	
 	std::vector<UEProperty> propertyMembers;
 	for (UEField fild = clss.GetChildren(); fild.IsValid(); fild = fild.GetNext())
 	{
@@ -258,32 +274,30 @@ Package::Class Package::GenerateClass(const UEClass& clss)
 		}
 		else if (fild.IsA(UEFunction::StaticClass()))
 		{
-			cls.functions.emplace_back(GenerateFunction(UEFunction(fild.GetUObject()), clss));
+			GenerateFunction(UEFunction(fild.GetUObject()), clss, cls.functions);
 		}
 			
 	}
 	std::sort(std::begin(propertyMembers), std::end(propertyMembers), CompareProperties);
 	
 	GenerateMembers(propertyMembers, clss, cls.members);
-
-	allClasses.push_back(cls);
-	return cls;
+	
+	allClasses.push_back(cls);*/
 }
 
-Package::Enum Package::GenerateEnumClass(const UEEnum& enm)
+void Package::GenerateEnumClass(const UEEnum& enm)
 {
 	if (!enm.IsValid())
-		return Package::Enum();
+		return;
 
 	Package::Enum enumStruct;
 
 	enumStruct.fullName = enm.GetFullName();
 	enumStruct.name = enm.GetEnumTypeAsStr();
 	enumStruct.members = enm.GetAllNames();
-	enumStruct.underlayingType = "uint8";
+	enumStruct.underlayingType = "uint8_t";
 
 	allEnums.push_back(enumStruct);
-	return enumStruct;
 }
 
 

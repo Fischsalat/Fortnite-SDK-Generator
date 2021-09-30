@@ -34,13 +34,14 @@ private:
 
 	void CreateSDKHeaderFile(const fs::path& sdkPath, const std::vector<std::string>& packageNames);
 
-	static void SetStream(const fs::path&& sdkPath, std::ofstream& stream, FileType type, std::string packageName);
+	static void SetStream(const fs::path&& sdkPath, std::ofstream& stream, FileType type, std::string packageName, const bool bAppend);
 
 	void PrintFileHeader(std::ofstream& stream, const FileType& ft) const;
 	void PrintFileEnding(std::ofstream& stream, const FileType& ft) const;
 
-	void GenerateStructsFile(const std::vector<Package::Struct>& structs, const std::vector<Package::Enum>& enums, std::string packageName) const;
-	void GenerateClassFile(const std::vector<Package::Class>& classes, std::string packageName) const;
-	void GenerateParameterFile(const std::vector<Package::Function>& parameters, std::string packageName) const;
-	void GenerateFunctionFile(const std::vector<Package::Function>& functions, std::string packageName) const;
-};
+	void GenerateStructsFile(const std::vector<Package::Struct>& structs, const std::vector<Package::Enum>& enums, std::string packageName, bool bPrintedBefore, bool bPrintFileEnding) const;
+	void GenerateClassFile(const std::vector<Package::Class>& classes, std::string packageName, bool bPrintedBefore, bool bPrintFileEnding) const;
+	void GenerateParameterFile(const std::vector<Package::Function>& parameters, std::string packageName, bool bPrintedBefore, bool bPrintFileEnding) const;
+	void GenerateFunctionFile(const std::vector<Package::Function>& functions, std::string packageName, bool bPrintedBefore, bool bPrintFileEnding) const;
+
+}; 

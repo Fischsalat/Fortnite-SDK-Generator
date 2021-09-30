@@ -72,9 +72,13 @@ std::string UEObject::GetCppName() const
 	if (IsA<UEClass>())
 	{
 		if (IsA<UEActor>())
+		{
 			name += 'A';
+		}
 		else if (IsA<UEObject>())
+		{
 			name += 'U';
+		}
 	}
 	else
 	{

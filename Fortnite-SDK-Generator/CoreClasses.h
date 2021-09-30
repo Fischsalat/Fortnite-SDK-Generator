@@ -24,9 +24,35 @@ public:
 	{
 		return data != nullptr;
 	}
-	inline bool IsValidIndex(int32 index)
+	inline bool IsValidIndex(uint32 index)
 	{
-		return index >= 0 && index < numElements;
+		return index < numElements;
+	}
+	inline int32 GetSlack()
+	{
+		return maxElements - numElements;
+	}
+	inline void Add(T element)
+	{
+		if (GetSlack() >= 1)
+		{
+			data[numElements] = element;
+			numElements++;
+		}
+		else
+		{
+			data = reinterpret_cast<T*>(realloc(data, sizeof(T) * numElements + 1));
+			data[numElements++] = element;
+			maxElements = numElements;
+		}
+	}
+	inline void Free()
+	{
+		static auto FreeInternal = reinterpret_cast<void(*)(void*)>(reinterpret_cast<uintptr_t>(GetModuleHandle(0)) + Offset::Free);
+		FreeInternal(data);
+		data = nullptr;
+		numElements = 0;
+		maxElements = 0;
 	}
 
 	inline T& operator[](int32 index)
@@ -61,6 +87,10 @@ public:
 			return std::wstring(data);
 
 		return L"";
+	}
+	inline const wchar_t* c_str()
+	{
+		return data;
 	}
 
 	inline FString operator=(const wchar_t*&& other)

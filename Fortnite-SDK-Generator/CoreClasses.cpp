@@ -8,6 +8,9 @@ tToString fToString = reinterpret_cast<tToString>(reinterpret_cast<uintptr_t>(Ge
 typedef void(__thiscall* tGetFullName)(const class UObject*, FString&, UObject*);
 tGetFullName fGetFullName = reinterpret_cast<tGetFullName>(reinterpret_cast<uintptr_t>(GetModuleHandle(0)) + Offset::GetFullName);
 
+typedef void(__fastcall* tFreeInternal)(void*);
+tFreeInternal FreeInternal = reinterpret_cast<tFreeInternal>(reinterpret_cast<uintptr_t>(GetModuleHandle(0)) + Offset::Free);
+
 std::string FName::ToString() const
 {
 	if (!this)
@@ -17,6 +20,7 @@ std::string FName::ToString() const
 	fToString(this, outStr);
 
 	std::string outName = outStr.ToString();
+	outStr.Free();
 
 	if (number > 0)
 		outName += '_' + std::to_string(number);
@@ -26,6 +30,7 @@ std::string FName::ToString() const
 		return outName;
 
 	return outName.substr(pos + 1);
+	
 }
 
 std::string UObject::GetName() const
@@ -45,6 +50,7 @@ std::string UObject::GetFullName() const
 	fGetFullName(this, outName, nullptr);
 
 	std::string name = outName.ToString();
+	outName.Free();
 
 	if (name.find(":") != NPOS)
 		name.replace(name.find(":"), 1, ".");

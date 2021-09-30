@@ -24,6 +24,7 @@ bool UEObjectStore::Initialize()
 		std::cout << "UObjectStore::Initialize() was false";
 		return false;
 	}
+	std::cout << GObjects->Num();
 
 	return true;
 }
@@ -114,7 +115,6 @@ UObjectIterator UEObjectStore::end() const
 {
 	return UObjectIterator(*this);
 }
-
 //-----------------------------------------------------------------------------------------------
 //UObjectIterator
 //-----------------------------------------------------------------------------------------------
@@ -132,25 +132,30 @@ UObjectIterator::UObjectIterator(const UObjectIterator& otherIt)
 {
 }
 
-UObjectIterator::UObjectIterator(UObjectIterator&& otherIt)
+UObjectIterator::UObjectIterator(UObjectIterator&& otherIt) noexcept
 	: objectsToIterate(otherIt.objectsToIterate), currentIndex(otherIt.currentIndex), currentObject(otherIt.currentObject)
 {
 }
 
-UObjectIterator& UObjectIterator::operator=(UObjectIterator otherIt)
+UObjectIterator& UObjectIterator::operator=(const UObjectIterator& otherIt)
 {
-	objectsToIterate = otherIt.objectsToIterate;
 	currentIndex = otherIt.currentIndex;
 	currentObject = otherIt.currentObject;
 	return *this;
 }
 
-bool UObjectIterator::operator==(UObjectIterator otherIt) const
+void UObjectIterator::swap(UObjectIterator& other) noexcept
+{
+	std::swap(currentIndex, other.currentIndex);
+	std::swap(currentObject, other.currentObject);
+}
+
+bool UObjectIterator::operator==(const UObjectIterator& otherIt) const
 {
 	return currentIndex == otherIt.currentIndex;
 }
 
-bool UObjectIterator::operator!=(UObjectIterator otherIt) const
+bool UObjectIterator::operator!=(const UObjectIterator& otherIt) const
 {
 	return currentIndex != otherIt.currentIndex;
 }
@@ -167,7 +172,6 @@ UEObject UObjectIterator::operator->() const
 
 UObjectIterator& UObjectIterator::operator++()
 {
-	currentObject = UEObject();
 	for (++currentIndex; currentIndex < objectsToIterate.GetNumObjects(); ++currentIndex)
 	{
 		currentObject = objectsToIterate.GetByIndex(currentIndex);

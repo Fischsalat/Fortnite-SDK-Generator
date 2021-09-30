@@ -12,6 +12,9 @@ private:
 	static std::unordered_set<int32> generatedStructs;
 
 public:
+	bool bPrintedBefore = false;
+
+public:
 	Package(UEObject _packageObj) : packageObj(_packageObj)
 	{
 	}
@@ -87,22 +90,15 @@ public:
 	std::vector<Function> allFunctions;
 
 public:
-	void Process();
+	void Process(const class Generator& gen);
 
 private:
-	bool IsDependend(const UEObject& obj);
-
-	void GeneratePrequesites(const UEObject& obj);
-
-	void GenerateMemberPrequesites(const UEObject& obj);
-	
-
 
 	void GenerateMembers(const std::vector<UEProperty>&, const UEStruct& super, std::vector<Member>& outMembers);
-	Function GenerateFunction(const UEFunction& function, const UEStruct& super);
-	Struct GenerateScritStruct(const UEStruct& strct);
-	Class GenerateClass(const UEClass& clss);
-	Enum GenerateEnumClass(const UEEnum& enm);
+	void GenerateFunction(const UEFunction& function, const UEStruct& super, std::vector<Function>& outFunctions);
+	void GenerateScritStruct(const UEStruct& strct);
+	void GenerateClass(const UEClass& clss);
+	void GenerateEnumClass(const UEEnum& enm);
 
 	Member GenerateBytePadding(int32 id, int32 offset, int32 padSize, std::string reason);
 	Member GenerateBitPadding(); // fix later
@@ -110,7 +106,7 @@ private:
 public:
 	inline bool IsEmpty()
 	{
-		return allEnums.empty() && allClasses.empty() && allStructs.empty() && allFunctions.empty();
+		return allEnums.empty() && allClasses.empty() && allStructs.empty() && allFunctions.empty() && !bPrintedBefore;
 	}
 
 };

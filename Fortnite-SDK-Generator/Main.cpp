@@ -20,7 +20,6 @@ DWORD WINAPI Main(LPVOID lpParam)
 	FILE* p;
 	freopen_s(&p, "CONOUT$", "w", stdout);
 	freopen_s(&p, "CONIN$", "r", stdin);
-
 	UEObjectStore::Initialize();
 
 	std::cout << "search" << std::endl;
@@ -30,6 +29,27 @@ DWORD WINAPI Main(LPVOID lpParam)
 	Generator sdkGen;
 	sdkGen.Generate();
 
+	/*
+	std::cout << "Strting measurment now" << std::endl;
+	auto now = std::chrono::high_resolution_clock::now();
+
+	for (int i = 0; i < 50; i++)
+	{
+		for (auto obj : UEObjectStore())
+		{
+			if (obj.GetFullName() == "strstr")
+			{
+				std::cout << "hello workd" << std::endl;
+			}
+		}
+	}
+
+	auto after = std::chrono::high_resolution_clock::now();
+
+	auto something = std::chrono::duration_cast<std::chrono::milliseconds>(after - now);
+
+	std::cout << "Execution took: " << something.count() / 1000 << "s (" << something.count() << "ms)" << std::endl;
+	*/
 	/*
 	for (auto obj : UEObjectStore())
 	{
