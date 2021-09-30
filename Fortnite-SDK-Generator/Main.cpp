@@ -29,20 +29,6 @@ DWORD WINAPI Main(LPVOID lpParam)
 
 	Generator sdkGen;
 	sdkGen.Generate();
-
-	/*
-	for (auto obj : UEObjectStore())
-	{
-		if (!obj.IsValid())
-			continue;
-
-		if (obj.GetName().find("Default__") == NPOS && obj.IsA(UEEnum::StaticClass()))
-		{
-			
-		}
-			
-
-	}*/
 	
 	std::cout << "nfi" << std::endl;
 	

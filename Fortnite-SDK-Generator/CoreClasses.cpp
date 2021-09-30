@@ -17,6 +17,7 @@ std::string FName::ToString() const
 	fToString(this, outStr);
 
 	std::string outName = outStr.ToString();
+	outStr.Free();
 
 	if (number > 0)
 		outName += '_' + std::to_string(number);
@@ -45,6 +46,7 @@ std::string UObject::GetFullName() const
 	fGetFullName(this, outName, nullptr);
 
 	std::string name = outName.ToString();
+	outName.Free();
 
 	if (name.find(":") != NPOS)
 		name.replace(name.find(":"), 1, ".");

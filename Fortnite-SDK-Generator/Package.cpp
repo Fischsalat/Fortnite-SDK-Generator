@@ -250,9 +250,7 @@ Package::Class Package::GenerateClass(const UEClass& clss)
 	std::vector<UEProperty> propertyMembers;
 	for (UEField fild = clss.GetChildren(); fild.IsValid(); fild = fild.GetNext())
 	{
-		if (fild.IsA(UEProperty::StaticClass())
-			&& !UEProperty(fild.GetUObject()).GetElementSize() > 0
-			&& (!super.IsValid() || (super != clss && UEProperty(fild.GetUObject()).GetOffset() >= super.GetStructSize())))
+		if (fild.IsA(UEProperty::StaticClass())	&& !UEProperty(fild.GetUObject()).GetElementSize() > 0)
 		{
 			propertyMembers.push_back(UEProperty(fild.GetUObject()));
 		}
@@ -280,7 +278,7 @@ Package::Enum Package::GenerateEnumClass(const UEEnum& enm)
 	enumStruct.fullName = enm.GetFullName();
 	enumStruct.name = enm.GetEnumTypeAsStr();
 	enumStruct.members = enm.GetAllNames();
-	enumStruct.underlayingType = "uint8";
+	enumStruct.underlayingType = "uint8_t";
 
 	allEnums.push_back(enumStruct);
 	return enumStruct;

@@ -28,6 +28,7 @@ public:
 
 	class UObjectIterator end();
 	class UObjectIterator end() const;
+
 };
 
 class UObjectIterator
@@ -42,11 +43,11 @@ public:
 	UObjectIterator(const UEObjectStore& storeToIt, int32 index);
 
 	UObjectIterator(const UObjectIterator& otherIt);
-	UObjectIterator(UObjectIterator&& otherIt);
+	UObjectIterator(UObjectIterator&& otherIt) noexcept;
 
-	UObjectIterator& operator=(UObjectIterator otherIt);
-	bool operator==(UObjectIterator otherIt) const;
-	bool operator!=(UObjectIterator otherIt) const;
+	UObjectIterator& operator=(const UObjectIterator& otherIt);
+	bool operator==(const UObjectIterator& otherIt) const;
+	bool operator!=(const UObjectIterator& otherIt) const;
 
 	UEObject operator*() const;
 	UEObject operator->() const;

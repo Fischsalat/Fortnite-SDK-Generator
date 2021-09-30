@@ -132,12 +132,12 @@ UObjectIterator::UObjectIterator(const UObjectIterator& otherIt)
 {
 }
 
-UObjectIterator::UObjectIterator(UObjectIterator&& otherIt)
+UObjectIterator::UObjectIterator(UObjectIterator&& otherIt) noexcept
 	: objectsToIterate(otherIt.objectsToIterate), currentIndex(otherIt.currentIndex), currentObject(otherIt.currentObject)
 {
 }
 
-UObjectIterator& UObjectIterator::operator=(UObjectIterator otherIt)
+UObjectIterator& UObjectIterator::operator=(const UObjectIterator& otherIt)
 {
 	objectsToIterate = otherIt.objectsToIterate;
 	currentIndex = otherIt.currentIndex;
@@ -145,12 +145,12 @@ UObjectIterator& UObjectIterator::operator=(UObjectIterator otherIt)
 	return *this;
 }
 
-bool UObjectIterator::operator==(UObjectIterator otherIt) const
+bool UObjectIterator::operator==(const UObjectIterator& otherIt) const
 {
 	return currentIndex == otherIt.currentIndex;
 }
 
-bool UObjectIterator::operator!=(UObjectIterator otherIt) const
+bool UObjectIterator::operator!=(const UObjectIterator& otherIt) const
 {
 	return currentIndex != otherIt.currentIndex;
 }

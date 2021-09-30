@@ -240,11 +240,11 @@ void Generator::GenerateParameterFile(const std::vector<Package::Function>& para
 		else
 			stream << std::format("//0x{:04X} (0x{:04X} - 0x{:04X})\n", parm.selfAsStruct.structSize - parm.selfAsStruct.inheritedSize, parm.selfAsStruct.structSize, parm.selfAsStruct.inheritedSize);
 
-		stream << parm.parameterStructName << "\n{\n";
+		stream << "struct " << parm.parameterStructName << "\n{\n";
 
 		for (auto member : parm.selfAsStruct.members)
 		{
-			stream << std::format("\t{:{}}{:{}}//{}({})", member.type, 50, member.name += ";", 75, member.offset, member.size);
+			stream << std::format("\t{:{}}{:{}}//{}({})\n", member.type, 50, member.name += ";", 75, member.offset, member.size);
 		}
 
 		stream << "};\n" << std::endl;
