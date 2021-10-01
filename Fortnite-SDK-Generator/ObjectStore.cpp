@@ -81,6 +81,33 @@ UEClass UEObjectStore::FindClass(std::string className)
 
 void UEObjectStore::GetAllPackages(std::vector<UEObject>& outPackages)
 {
+	std::unordered_map<UEObject, bool> nonEmptyPackages;
+
+	for (auto obj : UEObjectStore())
+	{
+		if (!obj.IsValid())
+			continue;
+
+		if (obj.GetClass() == UEPackage::StaticClass())
+		{
+			nonEmptyPackages[obj] = false;
+		}
+	}
+	for (auto obj : UEObjectStore())
+	{
+		if (!obj.IsValid())
+			continue;
+
+		nonEmptyPackages[obj.GetPackage()] = true;
+	}
+	for (auto value : nonEmptyPackages)
+	{
+		if (value.second)
+		{
+			outPackages.push_back(value.first);
+		}
+	}
+	/*
 	for (auto obj : UEObjectStore())
 	{
 		if (!obj.IsValid())
@@ -90,9 +117,12 @@ void UEObjectStore::GetAllPackages(std::vector<UEObject>& outPackages)
 		{
 			std::string objName = obj.GetName();
 			if (objName.find("Default__") == NPOS && objName.find("Uninitialized") == NPOS && objName.find("placeholder") == NPOS)
+			{
 				outPackages.push_back(obj);
+			}
 		}
 	}
+	*/
 }
 
 UObjectIterator UEObjectStore::begin()

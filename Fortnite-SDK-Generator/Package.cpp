@@ -76,7 +76,7 @@ void Package::GenerateMembers(const std::vector<UEProperty>& memberVector, const
 
 		if (mObj.offset > lastPropertyEnd)
 		{
-			outMembers.emplace_back(GenerateBytePadding(padCount, lastPropertyEnd, mObj.offset - lastPropertyEnd, "Fixing size after last property"));
+			outMembers.emplace_back(GenerateBytePadding(lastPropertyEnd, mObj.offset - lastPropertyEnd, "Fixing size after last property"));
 		}
 		
 		lastPropertyOffset = mObj.offset;
@@ -209,7 +209,7 @@ Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 
 	if (possibleSizeFix > 0)
 	{
-		str.members.push_back(GenerateBytePadding(rand(), offsetForPad, possibleSizeFix, "FIXING SIZE"));
+		str.members.push_back(GenerateBytePadding(offsetForPad, possibleSizeFix, "FIXING SIZE"));
 	}
 	
 
@@ -230,9 +230,11 @@ Package::Class Package::GenerateClass(const UEClass& clss)
 	Package::Class cls;
 
 	cls.fullName = clss.GetFullName();
+
 	cls.cppName = className;
 	cls.inheritedSize = 0;
 	cls.structSize = 0;
+	cls.index = clss.GetInernalIndex();
 
 	UEClass super = clss.GetSuper().Cast<UEClass>();
 
@@ -250,7 +252,7 @@ Package::Class Package::GenerateClass(const UEClass& clss)
 	std::vector<UEProperty> propertyMembers;
 	for (UEField fild = clss.GetChildren(); fild.IsValid(); fild = fild.GetNext())
 	{
-		if (fild.IsA(UEProperty::StaticClass())	&& !UEProperty(fild.GetUObject()).GetElementSize() > 0)
+		if (fild.IsA(UEProperty::StaticClass())	&& UEProperty(fild.GetUObject()).GetElementSize() > 0)
 		{
 			propertyMembers.push_back(UEProperty(fild.GetUObject()));
 		}
@@ -258,7 +260,6 @@ Package::Class Package::GenerateClass(const UEClass& clss)
 		{
 			cls.functions.emplace_back(GenerateFunction(UEFunction(fild.GetUObject()), clss));
 		}
-			
 	}
 	std::sort(std::begin(propertyMembers), std::end(propertyMembers), CompareProperties);
 	
@@ -285,14 +286,16 @@ Package::Enum Package::GenerateEnumClass(const UEEnum& enm)
 }
 
 
-Package::Member Package::GenerateBytePadding(int32 id, int32 offset, int32 padSize, std::string reason)
+Package::Member Package::GenerateBytePadding(int32 offset, int32 padSize, std::string reason) const
 {
+	static int64 padCount;
 	Member padMember;
-	padMember.name = std::format("UnknownData{:02d}[0x{:X}]", id, padSize);
-	padMember.type = "uint8";
+	padMember.name = std::format("UnknownData{:02d}[0x{:X}]", padCount, padSize);
+	padMember.type = "uint8_t";
 	padMember.size = padSize;
 	padMember.offset = offset;
 	padMember.comment = std::move(reason);
+	padCount++;
 
 	return padMember;
 }

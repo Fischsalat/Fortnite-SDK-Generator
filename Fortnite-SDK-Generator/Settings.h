@@ -26,7 +26,7 @@ namespace Settings
 	
 	__forceinline const std::string GetParamNamespace()
 	{
-		return "param";
+		return "params";
 	}
 
 	__forceinline const bool ShouldUseStrings()
@@ -36,11 +36,38 @@ namespace Settings
 
 	__forceinline const bool ShouldUsePrecompiledHeaders()
 	{
+		return false;
+	}
+
+	__forceinline const bool ShouldXorStrings()
+	{
 		return true;
+	}
+
+	__forceinline const std::string XorText()
+	{
+		return "XORSTR";
 	}
 
 	__forceinline const std::string GetGameVersion()
 	{
 		return "1.2";
+	}
+
+	__forceinline const std::pair<std::vector<std::string>, std::vector<std::string>>& GetIncludes()
+	{
+		// std::pair<librarys, own headers> 
+		static std::pair<std::vector<std::string>, std::vector<std::string>> inclues = 
+		{
+			{
+				"windows.h",
+				"iostream",
+				"fstream",
+			},
+			{
+				"Utils.h"
+			}
+		};
+		return inclues;
 	}
 };

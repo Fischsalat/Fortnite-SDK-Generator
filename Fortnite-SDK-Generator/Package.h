@@ -77,6 +77,7 @@ public:
 	};
 	struct Class : public Struct
 	{
+		int32 index;				// 0x5FD
 		std::vector<Function> functions;
 	};
 
@@ -104,7 +105,7 @@ private:
 	Class GenerateClass(const UEClass& clss);
 	Enum GenerateEnumClass(const UEEnum& enm);
 
-	Member GenerateBytePadding(int32 id, int32 offset, int32 padSize, std::string reason);
+	Member GenerateBytePadding(int32 offset, int32 padSize, std::string reason) const;
 	Member GenerateBitPadding(); // fix later
 
 public:

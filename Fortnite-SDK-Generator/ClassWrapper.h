@@ -17,6 +17,10 @@ public:
 	UEObject(UObject* obj) : object(obj) 
 	{
 	}
+	UEObject(const UEObject& other)
+	{
+		object = other.object;
+	}
 
 	bool operator==(UEObject other) const;
 	bool operator!=(UEObject other) const;

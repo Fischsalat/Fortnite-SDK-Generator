@@ -27,9 +27,43 @@ DWORD WINAPI Main(LPVOID lpParam)
 	
 	std::cout << std::format("Hello{:{}X}", 0xFF, 50) << "\n\n\n";
 
-	Generator sdkGen;
-	sdkGen.Generate();
-	
+	/*Generator sdkGen;
+	sdkGen.Generate();*/
+
+	std::vector<UEObject> outPackages;
+
+	UEObjectStore::GetAllPackages(outPackages);
+
+	std::cout << "Num: " << outPackages.size() << std::endl;
+
+	/*
+	{
+		std::cout << "\n\nStrting measurment now" << std::endl;
+		auto now = std::chrono::high_resolution_clock::now();
+
+		for (int i = 0; i < 5000; i++)
+		{
+			std::cout << std::format("Hallo {}\n", i);
+		}
+
+		auto after = std::chrono::high_resolution_clock::now();
+		auto something = std::chrono::duration_cast<std::chrono::milliseconds>(after - now);
+		std::cout << "Execution took: " << something.count() / 1000 << "s (" << something.count() << "ms)" << std::endl;
+
+	}
+	*/
+
+	/*
+	int ddlSoup = 342;
+	int count = 0;
+	const double percent = static_cast<double>(ddlSoup) / 100;
+
+	for (int i = 0; i < 342; i++)
+	{
+		std::cout << std::format("I: {}\nSinglePercent: {}\nPercent: {:.0f}\n", i, percent, i / percent);
+	}
+	*/
+
 	std::cout << "nfi" << std::endl;
 	
 	return 0;

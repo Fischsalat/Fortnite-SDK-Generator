@@ -26,10 +26,15 @@ void Generator::ProcessPackages(const fs::path& sdkPath, std::vector<std::string
 	std::vector<UEObject> packageObjects;
 	UEObjectStore::GetAllPackages(packageObjects);
 
+	std::cout << std::format("Generation started...\nPackage-Count: 0x{:X}\n\n", packageObjects.size());
+
+	const double percent = double(packageObjects.size()) / 100;
+	int32 packageCount = 0;
+
 	for (auto packageObj : packageObjects)
 	{
 		std::string packageName = packageObj.GetName();
-		std::cout << "Started processing package " << packageName << "\n";
+		std::cout << std::format("Started processing package {}\n", packageName);
 
 		Package pack(packageObj);
 		pack.Process();
@@ -40,15 +45,35 @@ void Generator::ProcessPackages(const fs::path& sdkPath, std::vector<std::string
 			GenerateStructsFile(pack.allStructs, pack.allEnums, packageName);
 			GenerateParameterFile(pack.allFunctions, packageName);
 			GenerateFunctionFile(pack.allFunctions, packageName);
+			outNames.push_back(packageName);
 		}
 
-		std::cout << "Processed package " << packageName << "\n\n";
+		std::cout << std::format("Processed package {} ({} out of {} [{:.0f}%])\n", packageName, packageCount, packageObjects.size(), packageCount / percent);
+		packageCount++;
 	}
 }
 
 void Generator::CreateSDKHeaderFile(const fs::path& sdkPath, const std::vector<std::string>& packageNames)
 {
 	std::ofstream stream(sdkPath / "SDK.hpp");
+
+	stream << "#pragma once\n";
+
+	for (auto defaultLib : Settings::GetIncludes().first)
+	{
+		stream << std::format("#include<{}>\n", defaultLib);
+	}
+	for (auto ownHeader : Settings::GetIncludes().second)
+	{
+		stream << std::format("#include\"{}\"", ownHeader);
+	}
+
+	for (auto fileName : packageNames)
+	{
+		stream << std::format("#include \"SDK/{}_structs.hpp\"\n");
+		stream << std::format("#include \"SDK/{}_classes.hpp\"\n");
+		stream << std::format("#include \"SDK/{}_parameters.hpp\"\n");
+	}
 }
 
 void Generator::SetStream(const fs::path&& sdkPath, std::ofstream& stream, FileType type, std::string packageName)
@@ -134,10 +159,6 @@ void Generator::GenerateStructsFile(const std::vector<Package::Struct>& structs,
 
 	for (auto scriptStruct : structs)
 	{
-		if (scriptStruct.cppName == "FInt32Range")
-			std::cout << "pause" << std::endl;
-
-
 		stream << std::format("//{}\n", scriptStruct.fullName);
 
 		if (scriptStruct.inheritedSize == 0)
@@ -192,7 +213,25 @@ void Generator::GenerateClassFile(const std::vector<Package::Class>& classes, st
 		}
 
 		stream << "\n\tstatic UClass* StaticClass()\n\t{";
-		stream << std::format("\n\t\tstatic auto ptr = UObject::FindClass(\"{}\");\n\t\treturn ptr;\n", clss.fullName);
+		
+		if (Settings::ShouldUseStrings())
+		{
+			stream << "\n\t\tstatic auto ptr = UObject::FindClass";
+			if (Settings::ShouldXorStrings())
+			{
+				stream << std::format("({}(\"{}\"))", Settings::XorText(), clss.fullName);
+			}
+			else
+			{
+				stream << std::format("(\"{}\");", clss.fullName);
+			}
+			stream << "\n\t\treturn ptr;\n";
+		}
+		else
+		{
+			stream << std::format("\n\t\tstatic auto ptr = UObject::GetByIndex<UClass>(0x{:X});\n\t\treturn ptr;\n", clss.index);
+		}
+		
 		stream << "\t}\n";
 
 		if (!clss.functions.empty())
