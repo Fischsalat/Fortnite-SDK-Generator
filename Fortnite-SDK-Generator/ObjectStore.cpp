@@ -33,6 +33,11 @@ UEObject UEObjectStore::GetByIndex(int32 index) const
 	return UEObject(GObjects->objObjects.objects[index].object);
 }
 
+UEObject UEObjectStore::StaticGetByIndex(int32 index)
+{
+	return UEObject(GObjects->objObjects.objects[index].object);
+}
+
 int32 UEObjectStore::GetNumObjects() const
 {
 	return GObjects->objObjects.numElements;
@@ -81,8 +86,7 @@ UEClass UEObjectStore::FindClass(std::string className)
 
 void UEObjectStore::GetAllPackages(std::vector<UEObject>& outPackages)
 {
-	std::unordered_map<UEObject, bool> nonEmptyPackages;
-
+	
 	for (auto obj : UEObjectStore())
 	{
 		if (!obj.IsValid())
@@ -90,39 +94,9 @@ void UEObjectStore::GetAllPackages(std::vector<UEObject>& outPackages)
 
 		if (obj.GetClass() == UEPackage::StaticClass())
 		{
-			nonEmptyPackages[obj] = false;
+			outPackages.push_back(obj);
 		}
 	}
-	for (auto obj : UEObjectStore())
-	{
-		if (!obj.IsValid())
-			continue;
-
-		nonEmptyPackages[obj.GetPackage()] = true;
-	}
-	for (auto value : nonEmptyPackages)
-	{
-		if (value.second)
-		{
-			outPackages.push_back(value.first);
-		}
-	}
-	/*
-	for (auto obj : UEObjectStore())
-	{
-		if (!obj.IsValid())
-			continue;
-
-		if (obj.GetClass() == UEPackage::StaticClass())
-		{
-			std::string objName = obj.GetName();
-			if (objName.find("Default__") == NPOS && objName.find("Uninitialized") == NPOS && objName.find("placeholder") == NPOS)
-			{
-				outPackages.push_back(obj);
-			}
-		}
-	}
-	*/
 }
 
 UObjectIterator UEObjectStore::begin()

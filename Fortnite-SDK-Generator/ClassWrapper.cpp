@@ -101,6 +101,7 @@ UEClass UEObject::GetClass() const
 UEObject UEObject::GetPackage() const
 {
 	UEObject packageObj;
+
 	for (UEObject obj = GetOuter(); obj.IsValid(); obj = obj.GetOuter())
 	{
 		packageObj = obj;

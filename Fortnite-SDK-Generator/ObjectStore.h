@@ -9,6 +9,7 @@ public:
 	static void DumpObjects();
 
 	static bool Initialize();
+	static UEObject StaticGetByIndex(int32 index);
 
 	UEObject GetByIndex(int32 index) const;
 	int32 GetNumObjects() const;

@@ -27,14 +27,8 @@ DWORD WINAPI Main(LPVOID lpParam)
 	
 	std::cout << std::format("Hello{:{}X}", 0xFF, 50) << "\n\n\n";
 
-	/*Generator sdkGen;
-	sdkGen.Generate();*/
-
-	std::vector<UEObject> outPackages;
-
-	UEObjectStore::GetAllPackages(outPackages);
-
-	std::cout << "Num: " << outPackages.size() << std::endl;
+	Generator sdkGen;
+	sdkGen.Generate();
 
 	/*
 	{
