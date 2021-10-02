@@ -65,6 +65,11 @@ std::string UEObject::GetFullName() const
 	return object->GetFullName();
 }
 //----------------------------------------
+std::string UEObject::GetValidName() const
+{
+	return MakeValidCppName(GetName());
+}
+//----------------------------------------
 std::string UEObject::GetCppName() const
 {
 	std::string name;
@@ -84,8 +89,9 @@ std::string UEObject::GetCppName() const
 	{
 		name += 'F';
 	}
+	std::string objName = GetName();
 
-	return MakeValidCppName(name += GetName());
+	return objName == "Actor" ? "AActor" : MakeValidCppName(name += objName);
 }
 //----------------------------------------
 UEObject UEObject::GetOuter() const
@@ -126,6 +132,9 @@ bool UEObject::IsA() const
 //----------------------------------------
 bool UEObject::IsA(UEClass staticClass) const
 {
+	if (!IsValid())
+		return false;
+
 	if (GetClass().IsValid())
 	{
 		for (UEClass clss = GetClass(); clss.IsValid(); clss = clss.GetSuper().Cast<UEClass>())
@@ -611,6 +620,50 @@ bool UE_boolProperty::IsNormalBool() const
 bool UE_boolProperty::IsBitField() const
 {
 	return !IsNormalBool();
+}
+//----------------------------------------
+uint8 UE_boolProperty::GetBitPosition() const
+{
+	if (IsBitField())
+	{
+		int32 mask = GetFieldMask();
+
+		if (mask == 0x01) return 1;
+		if (mask == 0x02) return 2;
+		if (mask == 0x04) return 3;
+		if (mask == 0x08) return 4;
+		if (mask == 0x10) return 5;
+		if (mask == 0x20) return 6;
+		if (mask == 0x40) return 7;
+		if (mask == 0x80) return 8;
+	}
+}
+//----------------------------------------
+uint8_t UE_boolProperty::GetMissingBitCount() const
+{
+	UEObject next = GetNext();
+	if (next.IsA(UE_boolProperty::StaticClass()))
+	{
+		UE_boolProperty other = next.Cast<UE_boolProperty>();
+
+		if (other.GetOffset() == GetOffset())
+		{
+			return  other.GetBitPosition() - GetBitPosition() - 1;
+		}
+		else
+		{
+			return (8 - GetBitPosition()) + other.GetBitPosition() - 1;
+		}
+	}
+	/*
+	if (GetOffset() == other.GetOffset())
+	{
+		return GetBitPosition() - other.GetBitPosition() - 1;
+	}
+	else
+	{
+		return (8 - other.GetBitPosition()) + GetBitPosition() - 1;
+	}*/
 }
 //----------------------------------------
 std::string UE_boolProperty::GetTypeStr() const

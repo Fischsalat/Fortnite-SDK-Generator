@@ -46,29 +46,39 @@ void Package::Process()
 void Package::GenerateMembers(const std::vector<UEProperty>& memberVector, const UEStruct& super, std::vector<Package::Member>& outMembers)
 {
 	std::unordered_map<std::string, int32> nameCache;
-	int32 padCount = 0;
 
 	int32 lastPropertyOffset = super.GetStructSize();
 	int32 lastPropertySize = 0;
-
-	bool bLastPropertyWasBitField;
 
 	for (auto&& member : memberVector)
 	{
 		Package::Member mObj;
 
+		Member bitPad;
+		bool bIsBitPadRequired = false;
+
 		if (member.IsA(UE_boolProperty::StaticClass()))
 		{
 			UE_boolProperty boolProp = member.Cast<UE_boolProperty>();
 
-			mObj.type = boolProp.GetTypeStr();
-			mObj.name = boolProp.GetCppName();
-			mObj.size = boolProp.GetElementSize();
+			if (boolProp.IsBitField())
+			{
+				mObj.bIsBitField = true;
+				mObj.bitFieldSize = 1;
+
+				const uint8_t missing = boolProp.GetMissingBitCount();
+
+				if (missing > 0)
+				{
+					bIsBitPadRequired = true;
+					bitPad = GenerateBitPadding(boolProp.GetOffset(), missing, "FIX BIT-FIELD SIZE");
+				}
+			}
 		}
 
 		mObj.type = member.GetPropertyType();
-		mObj.name = member.GetCppName();
-		mObj.size = member.GetElementSize(); 
+		mObj.name = member.GetValidName();
+		mObj.size = member.GetElementSize();
 		mObj.offset = member.GetOffset();
 		mObj.comment = std::format("0x{:04X}(0x{:04X})({})", mObj.offset, mObj.size, member.GetFlagsAsString());
 
@@ -93,8 +103,12 @@ void Package::GenerateMembers(const std::vector<UEProperty>& memberVector, const
 			mObj.name += std::format("{:2d}", it->second);
 		}
 
+		outMembers.push_back(mObj);
 
-		outMembers.emplace_back(std::move(mObj));
+		if (bIsBitPadRequired)
+		{
+			outMembers.push_back(bitPad);
+		}
 	}
 }
 
@@ -158,9 +172,6 @@ Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 {
 	if (!strct.IsValid())
 		return Package::Struct();
-
-	if (strct.GetFullName() == "Function FortniteGame.AIHotSpotSlot.OnStateChanged")
-		std::cout << "pause\n";
 
 	Package::Struct str;
 
@@ -288,9 +299,9 @@ Package::Enum Package::GenerateEnumClass(const UEEnum& enm)
 
 Package::Member Package::GenerateBytePadding(int32 offset, int32 padSize, std::string reason) const
 {
-	static int64 padCount;
+	static int64 padCount = 0x0;
 	Member padMember;
-	padMember.name = std::format("UnknownData{:02d}[0x{:X}]", padCount, padSize);
+	padMember.name = std::format("UnknownData{:04d}[0x{:X}]", padCount, padSize);
 	padMember.type = "uint8_t";
 	padMember.size = padSize;
 	padMember.offset = offset;
@@ -299,9 +310,20 @@ Package::Member Package::GenerateBytePadding(int32 offset, int32 padSize, std::s
 
 	return padMember;
 }
-/*
-Package::Member Package::GenerateBitPadding(int32 id, int32 offset, int32 padSize, std::string reason)
+
+Package::Member Package::GenerateBitPadding(int32 offset, int32 padSize, std::string reason) const
 {
-	
+	static int64 padCount = 0xFFF;
+	Member padMember;
+	padMember.name = std::format("UnknownData{:04d}", padCount, padSize);
+	padMember.type = "uint8_t";
+	padMember.size = 0;
+	padMember.offset = offset;
+	padMember.bIsBitField = true;
+	padMember.bitFieldSize = padSize;
+	padMember.comment = std::move(reason);
+	padCount++;
+
+	return padMember;
 }
-*/
+

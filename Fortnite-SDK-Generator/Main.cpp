@@ -8,9 +8,9 @@
 #include "Package.h"
 #include "Generator.h"
 
-//Knows bugs:
+//To do:
 /*
-* Too much classess/structs in the FortniteGame package
+* 
 *
 */
 
@@ -30,6 +30,45 @@ DWORD WINAPI Main(LPVOID lpParam)
 	Generator sdkGen;
 	sdkGen.Generate();
 
+	UEObject replicates = UEObjectStore::FindClass("BoolProperty Engine.Actor.bReplicates");
+	UE_boolProperty bReplicates = replicates.Cast<UE_boolProperty>();
+
+	std::cout << "Address: " << replicates.GetUObject() << std::endl;
+	std::cout << "Offset: "      << +bReplicates.GetOffset() << std::endl;
+	std::cout << "Missing: "     << +bReplicates.GetMissingBitCount() << std::endl;
+	std::cout << "BitPos:  "     << +bReplicates.GetBitPosition() << std::endl;
+	std::cout << "Size: "        <<	 bReplicates.GetElementSize() << std::endl;
+	std::cout << "Offset Next: " << UEProperty(bReplicates.GetNext().GetUObject()).GetOffset() << std::endl;
+
+	UEClass actorClass = UEObjectStore::FindClass("Class Engine.Actor");
+
+	if (actorClass.IsA(UEActor::StaticClass()))
+	{
+		std::cout << "cock" << std::endl;
+	}
+	else
+	{
+		std::cout << actorClass.GetUniqueName() << std::endl;
+	}
+
+	/*
+	for (auto obj : UEObjectStore())
+	{
+		if (obj.IsA(UE_boolProperty::StaticClass()))
+		{
+			UE_boolProperty boolProp = obj.Cast<UE_boolProperty>();
+
+			if (boolProp.IsBitField() && boolProp.GetFullName().find("Actor") != NPOS)
+			{
+				std::cout << boolProp.GetFullName() << std::endl;
+				std::cout << "ByteOffset: " <<  +boolProp.GetByteOffset() << std::endl;
+				std::cout << "FieldMask:  " <<  +boolProp.GetFieldMask()  << std::endl;
+				std::cout << "ByteMask:   " <<  +boolProp.GetByteMask()   << std::endl;
+			}
+			
+		}
+	}
+	*/
 	/*
 	{
 		std::cout << "\n\nStrting measurment now" << std::endl;

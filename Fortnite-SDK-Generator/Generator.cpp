@@ -48,7 +48,7 @@ void Generator::ProcessPackages(const fs::path& sdkPath, std::vector<std::string
 			outNames.push_back(packageName);
 		}
 
-		std::cout << std::format("Processed package {} ({} out of {} [{:.0f}%])\n", packageName, packageCount, packageObjects.size(), packageCount / percent);
+		std::cout << std::format("Processed package {} ({} out of {} [{:.0f}%])\n\n", packageName, packageCount, packageObjects.size(), packageCount / percent);
 		packageCount++;
 	}
 }
@@ -170,7 +170,15 @@ void Generator::GenerateStructsFile(const std::vector<Package::Struct>& structs,
 
 		for (auto member : scriptStruct.members)
 		{
-			stream << std::format("\t{:{}}{:{}}//{}\n", member.type, 55, member.name += ";", 75, member.comment);
+			if (member.bIsBitField)
+			{
+				member.name += " : " + std::to_string(member.bitFieldSize);
+				stream << std::format("\t{:{}}{:{}}//{}\n", member.type, 50, member.name += ";", 75, member.comment);
+			}
+			else
+			{
+				stream << std::format("\t{:{}}{:{}}//{}\n", member.type, 50, member.name += ";", 75, member.comment);
+			}
 		}
 		
 		stream << "};\n" << std::endl;
@@ -209,7 +217,15 @@ void Generator::GenerateClassFile(const std::vector<Package::Class>& classes, st
 		}
 		for (auto member : clss.members)
 		{
-			stream << std::format("\t{:{}}{:{}}//{}\n", member.type, 50, member.name += ";", 75, member.comment);
+			if (member.bIsBitField)
+			{
+				member.name += " : " + std::to_string(member.bitFieldSize);
+				stream << std::format("\t{:{}}{:{}}//{}\n", member.type, 50, member.name += ";", 75, member.comment);
+			}
+			else
+			{
+				stream << std::format("\t{:{}}{:{}}//{}\n", member.type, 50, member.name += ";", 75, member.comment);
+			}
 		}
 
 		stream << "\n\tstatic UClass* StaticClass()\n\t{";

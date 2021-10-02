@@ -34,10 +34,13 @@ public:
 	int32 GetFlags() const;
 	int32 GetInernalIndex() const;
 	int32 GetComparisonIndex() const;
+
 	std::string GetName() const;
 	FName GetFName() const;
 	std::string GetFullName() const;
+	std::string GetValidName() const;
 	std::string GetCppName() const;
+
 	UEObject GetOuter() const;
 	UEClass GetClass() const;
 	UEObject GetPackage() const;
@@ -218,7 +221,7 @@ public:
 	inline bool operator<(UE_boolProperty other) const
 	{
 		if (GetByteOffset() == other.GetByteOffset())
-			return GetByteMask() < other.GetByteMask();
+			return GetFieldMask() < other.GetFieldMask();
 
 		return GetByteOffset() < other.GetByteOffset();
 	}
@@ -229,6 +232,9 @@ public:
 	uint8 GetFieldMask() const;
 	bool IsNormalBool() const;
 	bool IsBitField() const;
+
+	uint8_t GetBitPosition() const;
+	uint8_t GetMissingBitCount() const;
 
 	std::string GetTypeStr() const;
 

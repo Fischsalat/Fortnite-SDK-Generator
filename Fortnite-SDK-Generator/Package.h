@@ -24,6 +24,8 @@ public:
 		std::string name;					// bIsBeingKicked : 1; bIsAlive, TimeStartedWaiting [no prefix]
 		int32 offset;						// 0x30
 		int32 size;							// 0x128
+		bool bIsBitField = false;			//
+		int32 bitFieldSize = 0;
 
 		std::string comment;				// 0x164(0x000C)(ZeroConstructor, InstancedReference, BlueprintAssignable)
 	}; 
@@ -91,13 +93,6 @@ public:
 	void Process();
 
 private:
-	bool IsDependend(const UEObject& obj);
-
-	void GeneratePrequesites(const UEObject& obj);
-
-	void GenerateMemberPrequesites(const UEObject& obj);
-	
-
 
 	void GenerateMembers(const std::vector<UEProperty>&, const UEStruct& super, std::vector<Member>& outMembers);
 	Function GenerateFunction(const UEFunction& function, const UEStruct& super);
@@ -106,7 +101,7 @@ private:
 	Enum GenerateEnumClass(const UEEnum& enm);
 
 	Member GenerateBytePadding(int32 offset, int32 padSize, std::string reason) const;
-	Member GenerateBitPadding(); // fix later
+	Member GenerateBitPadding(int32 offset, int32 padSize, std::string reason) const;
 
 public:
 	inline bool IsEmpty()
