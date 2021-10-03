@@ -61,18 +61,38 @@ void Generator::CreateSDKHeaderFile(const fs::path& sdkPath, const std::vector<s
 
 	for (auto defaultLib : Settings::GetIncludes().first)
 	{
-		stream << std::format("#include<{}>\n", defaultLib);
+		stream << std::format("#include <{}>\n", defaultLib);
 	}
+
+	stream << "\n";
+
 	for (auto ownHeader : Settings::GetIncludes().second)
 	{
-		stream << std::format("#include\"{}\"", ownHeader);
+		stream << std::format("#include \"{}\"\n", ownHeader);
 	}
+
+	stream << "\n";
+
+	if (Settings::ShouldIncludeUnrealTypedefs())
+	{
+		stream << "typedef __int8 int8;\n";
+		stream << "typedef __int16 int16;\n";
+		stream << "typedef __int32 int32;\n";
+		stream << "typedef __int64 int64;\n\n";
+
+		stream << "typedef unsigned __int8 uint8;\n";
+		stream << "typedef unsigned __int16 uint16;\n";
+		stream << "typedef unsigned __int32 uint32;\n";
+		stream << "typedef unsigned __int64 uint64;\n\n";
+	}
+
+	stream << "\n";
 
 	for (auto fileName : packageNames)
 	{
-		stream << std::format("#include \"SDK/{}_structs.hpp\"\n");
-		stream << std::format("#include \"SDK/{}_classes.hpp\"\n");
-		stream << std::format("#include \"SDK/{}_parameters.hpp\"\n");
+		stream << std::format("#include \"SDK/{}_structs.hpp\"\n", fileName);
+		stream << std::format("#include \"SDK/{}_classes.hpp\"\n", fileName);
+		stream << std::format("#include \"SDK/{}_parameters.hpp\"\n", fileName);
 	}
 }
 
@@ -125,6 +145,9 @@ void Generator::PrintFileEnding(std::ofstream& stream, const Generator::FileType
 		stream << "}\n\n";
 
 	stream << "#ifdef _MSC_VER\n\t#pragma pack(pop)\n#endif\n";
+
+	stream.flush();
+	stream.close();
 }
 
 void Generator::GenerateStructsFile(const std::vector<Package::Struct>& structs, const std::vector<Package::Enum>& enums, std::string packageName) const
@@ -155,7 +178,7 @@ void Generator::GenerateStructsFile(const std::vector<Package::Struct>& structs,
 		stream << "};\n\n\n";
 	}
 
-	stream << "\n" << std::endl;
+	stream << "\n\n";
 
 	for (auto scriptStruct : structs)
 	{
@@ -181,12 +204,10 @@ void Generator::GenerateStructsFile(const std::vector<Package::Struct>& structs,
 			}
 		}
 		
-		stream << "};\n" << std::endl;
+		stream << "};\n\n";
 	}
 
 	PrintFileEnding(stream, FileType::Struct);
-
-	stream.flush();
 }
 
 void Generator::GenerateClassFile(const std::vector<Package::Class>& classes, std::string packageName) const
@@ -268,13 +289,11 @@ void Generator::GenerateClassFile(const std::vector<Package::Class>& classes, st
 			}
 		}
 
-		stream << "};\n" << std::endl;
+		stream << "};\n\n";
 	}
 
 
 	PrintFileEnding(stream, FileType::Class);
-
-	stream.flush();
 }
 
 void Generator::GenerateParameterFile(const std::vector<Package::Function>& parameters, std::string packageName) const
@@ -302,12 +321,10 @@ void Generator::GenerateParameterFile(const std::vector<Package::Function>& para
 			stream << std::format("\t{:{}}{:{}}//{}({})\n", member.type, 50, member.name += ";", 75, member.offset, member.size);
 		}
 
-		stream << "};\n" << std::endl;
+		stream << "};\n\n";
 	}
 
 	PrintFileEnding(stream, FileType::Parameter);
-
-	stream.flush();
 }
 
 void Generator::GenerateFunctionFile(const std::vector<Package::Function>& functions, std::string packageName) const
@@ -373,12 +390,10 @@ void Generator::GenerateFunctionFile(const std::vector<Package::Function>& funct
 			stream << "\n\treturn parms.ReturnValue;\n";
 		}
 			
-		stream << "}\n" << std::endl;
+		stream << "}\n\n";
 	}
 
 	PrintFileEnding(stream, FileType::Function);
-
-	stream.flush();
 }
 
 Generator::Generator()

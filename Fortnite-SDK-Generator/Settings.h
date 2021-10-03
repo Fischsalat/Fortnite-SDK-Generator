@@ -41,7 +41,7 @@ namespace Settings
 
 	__forceinline const bool ShouldXorStrings()
 	{
-		return true;
+		return false;
 	}
 
 	__forceinline const std::string XorText()
@@ -69,5 +69,10 @@ namespace Settings
 			}
 		};
 		return inclues;
+	}
+
+	__forceinline const bool ShouldIncludeUnrealTypedefs()
+	{
+		return true;
 	}
 };

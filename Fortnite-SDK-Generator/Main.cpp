@@ -29,46 +29,41 @@ DWORD WINAPI Main(LPVOID lpParam)
 
 	Generator sdkGen;
 	sdkGen.Generate();
-
-	UEObject replicates = UEObjectStore::FindClass("BoolProperty Engine.Actor.bReplicates");
-	UE_boolProperty bReplicates = replicates.Cast<UE_boolProperty>();
-
-	std::cout << "Address: " << replicates.GetUObject() << std::endl;
-	std::cout << "Offset: "      << +bReplicates.GetOffset() << std::endl;
-	std::cout << "Missing: "     << +bReplicates.GetMissingBitCount() << std::endl;
-	std::cout << "BitPos:  "     << +bReplicates.GetBitPosition() << std::endl;
-	std::cout << "Size: "        <<	 bReplicates.GetElementSize() << std::endl;
-	std::cout << "Offset Next: " << UEProperty(bReplicates.GetNext().GetUObject()).GetOffset() << std::endl;
-
-	UEClass actorClass = UEObjectStore::FindClass("Class Engine.Actor");
-
-	if (actorClass.IsA(UEActor::StaticClass()))
-	{
-		std::cout << "cock" << std::endl;
-	}
-	else
-	{
-		std::cout << actorClass.GetUniqueName() << std::endl;
-	}
-
 	/*
+	std::unordered_map<int32, std::vector<int32>> map;
+
 	for (auto obj : UEObjectStore())
 	{
-		if (obj.IsA(UE_boolProperty::StaticClass()))
+		if (!obj.IsValid())
 		{
-			UE_boolProperty boolProp = obj.Cast<UE_boolProperty>();
+			continue;
+		}
 
-			if (boolProp.IsBitField() && boolProp.GetFullName().find("Actor") != NPOS)
+		if (!obj.IsA(UEPackage::StaticClass()))
+		{
+			if(obj.IsA(UEClass::StaticClass()) || obj.IsA(UEEnum::StaticClass()) || obj.IsA(UEStruct::StaticClass()))
 			{
-				std::cout << boolProp.GetFullName() << std::endl;
-				std::cout << "ByteOffset: " <<  +boolProp.GetByteOffset() << std::endl;
-				std::cout << "FieldMask:  " <<  +boolProp.GetFieldMask()  << std::endl;
-				std::cout << "ByteMask:   " <<  +boolProp.GetByteMask()   << std::endl;
+				map[obj.GetPackage().GetInernalIndex()].push_back(obj.GetInernalIndex());
 			}
-			
 		}
 	}
+
+	std::cout << "Package count: " << map.size() << std::endl;
+	Sleep(3000);
+
+	for (auto pair : map)
+	{
+		std::cout << "Package: " << UEObjectStore::StaticGetByIndex(pair.first).GetFullName() << "\nMemberCount: " << pair.second.size() << "\n\n";
+	}
+
+	std::vector<UEObject> vec;
+
+	UEObjectStore::GetAllPackages(vec);
+
+	std::cout << vec.size() << std::endl;
 	*/
+
+	
 	/*
 	{
 		std::cout << "\n\nStrting measurment now" << std::endl;
@@ -111,11 +106,3 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 
 	return TRUE;
 }
-
-
-/*
-* Package:
-* std::unordered_map<std::vector<std::string>* classMemberNames, std::string className>;
-* 
-* or rather instead of name strings just the comparison index...
-*/

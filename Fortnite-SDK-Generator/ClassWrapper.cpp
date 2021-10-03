@@ -637,6 +637,7 @@ uint8 UE_boolProperty::GetBitPosition() const
 		if (mask == 0x40) return 7;
 		if (mask == 0x80) return 8;
 	}
+	return 0xFF;
 }
 //----------------------------------------
 uint8_t UE_boolProperty::GetMissingBitCount() const
@@ -655,15 +656,7 @@ uint8_t UE_boolProperty::GetMissingBitCount() const
 			return (8 - GetBitPosition()) + other.GetBitPosition() - 1;
 		}
 	}
-	/*
-	if (GetOffset() == other.GetOffset())
-	{
-		return GetBitPosition() - other.GetBitPosition() - 1;
-	}
-	else
-	{
-		return (8 - other.GetBitPosition()) + GetBitPosition() - 1;
-	}*/
+	return 0;
 }
 //----------------------------------------
 std::string UE_boolProperty::GetTypeStr() const
