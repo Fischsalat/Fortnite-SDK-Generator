@@ -27,6 +27,7 @@ typedef unsigned __int32 uint32;
 typedef unsigned __int64 uint64;
 
 static class FUObjectArray* GObjects;
+static class UEObjectStore* ObjectStore;
 
 namespace Offset
 {

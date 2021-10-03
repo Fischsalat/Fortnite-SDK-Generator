@@ -90,7 +90,7 @@ public:
 	std::vector<Function> allFunctions;
 
 public:
-	void Process();
+	void Process(std::vector<int32>& packageMembers);
 
 private:
 

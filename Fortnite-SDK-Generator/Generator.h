@@ -43,4 +43,6 @@ private:
 	void GenerateClassFile(const std::vector<Package::Class>& classes, std::string packageName) const;
 	void GenerateParameterFile(const std::vector<Package::Function>& parameters, std::string packageName) const;
 	void GenerateFunctionFile(const std::vector<Package::Function>& functions, std::string packageName) const;
+
+	void GenerateBasicFile(const fs::path& sdkPath);
 };

@@ -22,17 +22,18 @@ DWORD WINAPI Main(LPVOID lpParam)
 	freopen_s(&p, "CONIN$", "r", stdin);
 
 	UEObjectStore::Initialize();
+	ObjectStore = new UEObjectStore();
 
 	std::cout << "search" << std::endl;
 	
 	std::cout << std::format("Hello{:{}X}", 0xFF, 50) << "\n\n\n";
 
-	//Generator sdkGen;
-	//sdkGen.Generate();
+	Generator sdkGen;
+	sdkGen.Generate();
 	
 	std::unordered_map<int32, std::vector<int32>> map;
 
-	for (auto obj : UEObjectStore())
+	for (auto obj : *ObjectStore)
 	{
 		if (!obj.IsValid())
 		{
@@ -62,11 +63,10 @@ DWORD WINAPI Main(LPVOID lpParam)
 		std::cout << "Package: " << UEObjectStore::StaticGetByIndex(pair.first).GetFullName() << "\nMemberCount: " << pair.second.size() << "\n\n";
 	}
 
-	std::vector<UEObject> vec;
 
-	UEObjectStore::GetAllPackages(vec);
+	UEObjectStore::GetAllPackages(map);
 
-	std::cout << vec.size() << std::endl;
+	std::cout << map.size() << std::endl;
 	
 	
 	/*

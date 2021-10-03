@@ -23,7 +23,7 @@ void Generator::Generate()
 void Generator::ProcessPackages(const fs::path& sdkPath, std::vector<std::string>& outNames)
 {
 	
-	std::vector<UEObject> packageObjects;
+	std::unordered_map<int32, std::vector<int32>> packageObjects;
 	UEObjectStore::GetAllPackages(packageObjects);
 
 	std::cout << std::format("Generation started...\nPackage-Count: 0x{:X}\n\n", packageObjects.size());
@@ -31,13 +31,15 @@ void Generator::ProcessPackages(const fs::path& sdkPath, std::vector<std::string
 	const double percent = double(packageObjects.size()) / 100;
 	int32 packageCount = 0;
 
-	for (auto packageObj : packageObjects)
+	for (auto pair : packageObjects)
 	{
+		UEObject packageObj = ObjectStore->GetByIndex(pair.first);
+
 		std::string packageName = packageObj.GetName();
 		std::cout << std::format("Started processing package {}\n", packageName);
 
 		Package pack(packageObj);
-		pack.Process();
+		pack.Process(pair.second);
 
 		if (!pack.IsEmpty())
 		{
@@ -460,6 +462,11 @@ Generator::Generator()
 		{ "class UProperty*", "PropertyLinkNext", 0x8 },
 		{ "int8_t", "Pad9[0x18]", 0x18 }
 	};
+}
+
+void Generator::GenerateBasicFile(const fs::path& sdkPath)
+{
+	
 }
 
 fs::path Generator::genPath;
