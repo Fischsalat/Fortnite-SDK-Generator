@@ -9,7 +9,7 @@ void UEObjectStore::DumpObjects()
 
 	stream << "Objects-dump for Fortnite 1.2\n\nNumber of objects: " << GObjects->Num() << "\n\n";
 
-	for (auto obj : UEObjectStore())
+	for (auto obj : *ObjectStore)
 	{
 		stream << std::format("[{:08X}]\t{:{}}\n", obj.GetInernalIndex(), obj.GetFullName(), 20);
 	}
@@ -51,7 +51,7 @@ int32 UEObjectStore::GetMaxNumObjects() const
 int32 UEObjectStore::CountObjects(UEClass staticClass, std::string objectName)
 {
 	int32 count = 0; 
-	for (auto obj : UEObjectStore())
+	for (auto obj : *ObjectStore)
 	{
 		if (obj.IsA(staticClass))
 		{
@@ -84,17 +84,21 @@ UEClass UEObjectStore::FindClass(std::string className)
 	return UEObjectStore::FindObject<UEClass>(className);
 }
 
-void UEObjectStore::GetAllPackages(std::vector<UEObject>& outPackages)
+void UEObjectStore::GetAllPackages(std::unordered_map<int32, std::vector<int32>>& outPackages)
 {
-	
-	for (auto obj : UEObjectStore())
+	outPackages.clear(); //Just in case I ever randomly feel like being retarded and adding to this map before using it
+
+	for (auto obj : *ObjectStore)
 	{
 		if (!obj.IsValid())
 			continue;
 
-		if (obj.GetClass() == UEPackage::StaticClass())
+		if (!obj.IsA(UEPackage::StaticClass()))
 		{
-			outPackages.push_back(obj);
+			if (obj.IsA(UEClass::StaticClass()) || obj.IsA(UEEnum::StaticClass()) || obj.IsA(UEStruct::StaticClass()))
+			{
+				outPackages[obj.GetPackage().GetInernalIndex()].push_back(obj.GetInernalIndex());
+			}
 		}
 	}
 }

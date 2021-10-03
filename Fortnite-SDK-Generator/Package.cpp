@@ -12,10 +12,12 @@ bool CompareProperties(UEProperty left, UEProperty right)
 	return left.GetOffset() < right.GetOffset();
 }
 
-void Package::Process()
+void Package::Process(std::vector<int32>& packageMembers)
 {
-	for (auto obj : UEObjectStore())
+	for (auto index : packageMembers)
 	{
+		UEObject obj = ObjectStore->GetByIndex(index);
+
 		if (!obj.IsValid() )
 			continue;
 
