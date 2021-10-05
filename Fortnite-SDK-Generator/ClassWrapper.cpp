@@ -582,7 +582,7 @@ UEClass UE_WeakObjectProperty::StaticClass()
 //-----------------------------------------------------------------------------------------------
 std::string UE_InterfaceProperty::GetTypeStr() const
 {
-	return std::format("struct FScriptInterface<{}>", GetObjPropertyClass().GetName());
+	return std::format("struct TScriptInterface<{}>", GetObjPropertyClass().GetName());
 }
 //-----------------------------------------------
 UEClass UE_InterfaceProperty::StaticClass()

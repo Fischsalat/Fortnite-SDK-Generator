@@ -195,7 +195,7 @@ Package::Struct Package::GenerateScritStruct(const UEStruct& strct)
 	}
 	str.structSize = strct.GetStructSize();
 
-	int32 possibleSizeFix = 0;
+	int32 possibleSizeFix = str.structSize - str.inheritedSize;;
 	int32 offsetForPad = 0;
 
 	std::vector<UEProperty> propertyMembers;

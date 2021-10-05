@@ -142,7 +142,7 @@ void Generator::PrintFileHeader(std::ofstream& stream, const Generator::FileType
 	}
 	else if (ft == FileType::Function)
 	{
-		stream << "#include \"../SDK.h\"\n\n";
+		stream << "#include \"../SDK.hpp\"\n\n";
 	}
 
 	if (Settings::ShouldUseNamespaceForSDK())
@@ -558,10 +558,6 @@ public:
 	{
 		return Index >= 0 && Index < NumElements;
 	}
-	inline bool IsValidIndex(int32_t Index)
-	{
-		return Index < NumElements;
-	}
 	inline int32 GetSlack()
 	{
 		return MaxElements - NumElements;
@@ -619,7 +615,7 @@ public:
 	{
 		if(IsValid())
 		{
-			return std::wstring(data);
+			return std::wstring(Data);
 		}
 
 		return L"";
@@ -656,7 +652,7 @@ public:
 		std::string OutName = OutStr.ToString();
 		OutStr.Free();
 
-		if (number > 0)
+		if (Number > 0)
 		{
 			OutName += '_' + std::to_string(Number);
 		}
@@ -676,7 +672,7 @@ public:
 	}
 	inline bool operator!=(FName Other)
 	{
-		return !(operator==);
+		return !(operator==(Other));
 	}
 };)" << "\n\n";
 
@@ -768,7 +764,7 @@ public:
 
 	inline UObject* GetUObject() const
 	{
-		return GObjects->ByIndex(ObjectIndex);
+		return UObject::GObjects->ByIndex(ObjectIndex);
 	}
 };)" << "\n\n";
 
@@ -808,6 +804,13 @@ public:
 	{
 		return InterfacePointer; //literally no fucking idea what's the use of a interface, but why not make a function to get it
 	}
+};
+
+template<class T>
+class TScriptInterface : public FScriptInterface
+{
+public:
+
 };)" << "\n\n";
 
 	stream << R"(template<typename TObjectID>
@@ -834,6 +837,12 @@ class FText
 {
 public:
 	int8_t Pad_99[0x18];
+};
+
+struct FScriptMulticastDelegate
+{
+public:
+	int8_t Pad_303[0x10];
 };)" << "\n\n";
 
 	PrintFileEnding(stream, FileType::OtherHeader);

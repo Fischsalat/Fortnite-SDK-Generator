@@ -61,8 +61,9 @@ namespace Settings
 		{
 			{
 				"windows.h",
+				"string",
 				"iostream",
-				"fstream",
+				"fstream"
 			},
 			{
 				"Utils.h"

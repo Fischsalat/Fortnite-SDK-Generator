@@ -70,11 +70,14 @@ UE_Type UEObjectStore::FindObject(std::string objectName)
 		UObject* obj = GObjects->ByIndex(i);
 
 		if (!obj)
+		{
 			return nullptr;
+		}
 
 		if (objectName == obj->GetFullName())
+		{
 			return UEObject(obj).Cast<UE_Type>();
-
+		}
 	}
 	return UEObject(nullptr).Cast<UE_Type>();
 }
