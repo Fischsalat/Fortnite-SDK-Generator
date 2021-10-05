@@ -16,7 +16,7 @@ void Package::Process(std::vector<int32>& packageMembers)
 {
 	for (auto index : packageMembers)
 	{
-		UEObject obj = ObjectStore->GetByIndex(index);
+		UEObject obj = UEObjectStore::StaticGetByIndex(index);
 
 		if (!obj.IsValid() )
 			continue;
@@ -317,7 +317,7 @@ Package::Member Package::GenerateBitPadding(int32 offset, int32 padSize, std::st
 {
 	static int64 padCount = 0xFFF;
 	Member padMember;
-	padMember.name = std::format("UnknownData{:04d}", padCount, padSize);
+	padMember.name = ""; // bit padding does not need a name
 	padMember.type = "uint8_t";
 	padMember.size = 0;
 	padMember.offset = offset;

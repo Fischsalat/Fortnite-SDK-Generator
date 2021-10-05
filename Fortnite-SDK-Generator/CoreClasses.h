@@ -109,7 +109,30 @@ public:
 	int32 comparisonIndex;
 	int32 number;
 
-	std::string ToString() const;
+	inline std::string ToString() const
+	{
+		if (!this)
+		{
+			return "";
+		}
+
+		static auto ToStr = reinterpret_cast<void(*)(const FName*, FString&)>(reinterpret_cast<uintptr_t>(GetModuleHandle(0)) + 0x117C420);
+
+		FString outStr;
+		ToStr(this, outStr);
+
+		std::string outName = outStr.ToString();
+		outStr.Free();
+
+		if (number > 0)
+			outName += '_' + std::to_string(number);
+
+		auto pos = outName.rfind('/');
+		if (pos == std::string::npos)
+			return outName;
+
+		return outName.substr(pos + 1);
+	}
 
 	inline bool operator==(FName other)
 	{
@@ -117,9 +140,10 @@ public:
 	}
 	inline bool operator!=(FName other)
 	{
-		return comparisonIndex != other.comparisonIndex;
+		return !(operator==(other));
 	}
 };
+
 
 template<typename Value, typename Key>
 class TPair
@@ -144,7 +168,10 @@ public:
 	FName name;
 	UObject* outer;
 
-	std::string GetName() const;
+	inline std::string GetName() const
+	{
+		return name.ToString();
+	}
 	std::string GetFullName() const;
 };
 
@@ -390,7 +417,7 @@ public:
 	}
 	inline bool operator!=(FWeakObjectPtr other)
 	{
-		return objectIndex != other.objectIndex || objectSerialNumber != other.objectSerialNumber;
+		return !(operator==(other));
 	}
 	inline FWeakObjectPtr& operator=(FWeakObjectPtr other)
 	{

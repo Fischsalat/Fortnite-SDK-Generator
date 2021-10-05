@@ -626,7 +626,7 @@ uint8 UE_boolProperty::GetBitPosition() const
 {
 	if (IsBitField())
 	{
-		int32 mask = GetFieldMask();
+		uint8 mask = GetFieldMask();
 
 		if (mask == 0x01) return 1;
 		if (mask == 0x02) return 2;

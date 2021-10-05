@@ -13,16 +13,30 @@ private:
 		std::string name;
 		int32 size;
 	};
+	struct PredefinedFunction
+	{
+		bool bIsStatic;
+		bool bIsTemplate;
+		bool bDefineInHeader;
+		bool bActuallyInline;
+		std::string returnType;
+		std::string name;
+		std::string allParams;
+		std::string body;
+	};
 	enum class FileType
 	{
 		Parameter,
 		Function,
 		Struct,
-		Class
+		Class,
+		OtherHeader,
+		OtherSource
 	};
 
 	static fs::path genPath;
 	static std::unordered_map<std::string, std::vector<Generator::PredefinedMember>> predefinedMembers;
+	static std::unordered_map<std::string, std::vector<Generator::PredefinedFunction>> predefinedFunctions;
 
 public:
 	Generator();
