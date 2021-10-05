@@ -7,7 +7,7 @@ tToString fToString = reinterpret_cast<tToString>(reinterpret_cast<uintptr_t>(Ge
 
 typedef void(__thiscall* tGetFullName)(const class UObject*, FString&, UObject*);
 tGetFullName fGetFullName = reinterpret_cast<tGetFullName>(reinterpret_cast<uintptr_t>(GetModuleHandle(0)) + Offset::GetFullName);
-
+/*
 std::string FName::ToString() const
 {
 	if (!this)
@@ -35,10 +35,29 @@ std::string UObject::GetName() const
 		return "";
 
 	return name.ToString();
-}
+}*/
 
 std::string UObject::GetFullName() const
 {
+	if (privateClass)
+	{
+		std::string temp;
+
+		for (UObject* outr = outer; outr != nullptr; outr = outr->outer)
+		{
+			temp = outer->GetName() + "." + temp;
+		}
+
+		std::string retName = privateClass->GetName() + " ";
+		retName += temp;
+		retName += GetName();
+
+		return retName;
+	}
+	return "";
+}
+
+	/*
 	if (!this)
 		return "";
 
@@ -68,7 +87,7 @@ std::string UObject::GetFullName() const
 
 	return name;
 }
-
+*/
 
 std::string UProperty::GetFlagsAsString() const
 {

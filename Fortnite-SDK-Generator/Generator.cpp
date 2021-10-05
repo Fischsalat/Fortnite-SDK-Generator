@@ -16,6 +16,7 @@ void Generator::Generate()
 	std::vector<std::string> packageNames;
 	
 	ProcessPackages(genPath / "SDK", packageNames);
+	GenerateBasicFile(genPath);
 
 	CreateSDKHeaderFile(genPath, packageNames);
 }
@@ -33,7 +34,7 @@ void Generator::ProcessPackages(const fs::path& sdkPath, std::vector<std::string
 
 	for (auto pair : packageObjects)
 	{
-		UEObject packageObj = ObjectStore->GetByIndex(pair.first);
+		UEObject packageObj = UEObjectStore::StaticGetByIndex(pair.first);
 
 		std::string packageName = packageObj.GetName();
 		std::cout << std::format("Started processing package {}\n", packageName);
@@ -89,6 +90,7 @@ void Generator::CreateSDKHeaderFile(const fs::path& sdkPath, const std::vector<s
 	}
 
 	stream << "\n";
+	stream << "#include \"SDK/Basic.hpp\"\n";
 
 	for (auto fileName : packageNames)
 	{
@@ -100,6 +102,8 @@ void Generator::CreateSDKHeaderFile(const fs::path& sdkPath, const std::vector<s
 
 void Generator::SetStream(const fs::path&& sdkPath, std::ofstream& stream, FileType type, std::string packageName)
 {
+	stream.close();
+
 	switch (type)
 	{
 	case Generator::FileType::Parameter:
@@ -114,6 +118,12 @@ void Generator::SetStream(const fs::path&& sdkPath, std::ofstream& stream, FileT
 	case Generator::FileType::Class:
 		stream.open(sdkPath / (packageName + "_classes.hpp"));
 		break;
+	case Generator::FileType::OtherHeader:
+		stream.open(sdkPath / (packageName + ".hpp"));
+		break;
+	case Generator::FileType::OtherSource:
+		stream.open(sdkPath / (packageName + ".cpp"));
+		break;
 	default:
 		stream.open(sdkPath / (packageName + ".hpp"));
 		break;
@@ -127,15 +137,23 @@ void Generator::PrintFileHeader(std::ofstream& stream, const Generator::FileType
 	stream << "#ifdef _MSC_VER\n\t#pragma pack(push, 0x8)\n#endif\n\n";
 
 	if (ft == FileType::Function && Settings::ShouldUsePrecompiledHeaders())
+	{
 		stream << "#include \"pch.h\"\n#include \"../pch.h\"\n\n";
+	}
 	else if (ft == FileType::Function)
+	{
 		stream << "#include \"../SDK.h\"\n\n";
+	}
 
 	if (Settings::ShouldUseNamespaceForSDK())
+	{
 		stream << "namespace " << Settings::GetSDKNamespace() << "\n{\n";
-
+	}
 	if (ft == FileType::Parameter && Settings::ShouldUseNamespaceForParams())
-		stream << "namespace " << Settings::GetParamNamespace() << "\n{\n";	
+	{
+		stream << "namespace " << Settings::GetParamNamespace() << "\n{\n";
+	}
+		
 }
 
 void Generator::PrintFileEnding(std::ofstream& stream, const Generator::FileType& ft) const
@@ -402,6 +420,7 @@ Generator::Generator()
 {
 	predefinedMembers["Class CoreUObject.Object"] =
 	{
+		{ "static class FUObjectArray*", "GObjects", 0x00 },
 		{ "void*", "Vft", 0x08 },
 		{ "int32_t", "Flags", 0x04 },
 		{ "int32_t", "Index", 0x04 },
@@ -462,12 +481,364 @@ Generator::Generator()
 		{ "class UProperty*", "PropertyLinkNext", 0x8 },
 		{ "int8_t", "Pad9[0x18]", 0x18 }
 	};
+
+	//------------------------------------------------------------------
+
+	predefinedFunctions["Class CoreUObject.Object"] =
+	{
+		{
+			false, false, true, true, "void", "ProcessEvent", "class UFunction* func, void* parms",
+			R"(return GetVFunction<void(*)(UObject*, class UFunction*, void*)>(this, /*PE-INDEX*/)(this, function, parms);)"
+		},
+		{
+			true, true, true, false, "T*", "FindObject", "const std::string&& name",
+			R"(for(int i = 0; i < GObjects->Num(); i++)
+{
+	UObject* obj = GObjects->GetByIndex(i);
+
+	if(!obj)
+	{
+		continue;
+	}
+
+	if(obj.GetFullName() == name)
+	{
+		return static_cast<T*>(obj);
+	}
+}
+return nullptr;)"
+		},
+		{
+			true, false, true, true, "UClass*", "GetByIndex", "const std::string&& name",
+			R"(return FindObject<UObject>(name);)"
+		},
+		{
+			true, false, true, true, "UObject*", "int index",
+			R"(return GObjects->ObjObjects.Objects[index].object;)"
+		},
+		{
+			true, true, true, true, "T*", "GetCasted", "int index",
+			R"(return static_cast<T*>(GetByIndex(index));)"
+		},
+		{
+
+		}
+	};
 }
 
 void Generator::GenerateBasicFile(const fs::path& sdkPath)
 {
-	
+	std::ofstream stream;
+
+	SetStream(sdkPath / "", stream, FileType::OtherHeader, "Basic");
+	PrintFileHeader(stream, FileType::OtherHeader);
+
+	stream << R"(class UObject;
+
+template<class T>
+class TArray
+{
+	friend class FString;
+
+private:
+	T* Data;
+	int32_t NumElements;
+	int32_t MaxElements;
+
+public:
+	inline int32_t Num()
+	{
+		return NumElements;
+	}
+	inline bool IsValid()
+	{
+		return Data != nullptr;
+	}
+	inline bool IsValidIndex(int32_t Index)
+	{
+		return Index >= 0 && Index < NumElements;
+	}
+	inline bool IsValidIndex(int32_t Index)
+	{
+		return Index < NumElements;
+	}
+	inline int32 GetSlack()
+	{
+		return MaxElements - NumElements;
+	}
+	inline void Add(T Element)
+	{
+		if (GetSlack() >= 1)
+		{
+			Data[NumElements] = Element;
+			NumElements++;
+		}
+		else
+		{
+			Data = reinterpret_cast<T*>(realloc(Data, sizeof(T) * NumElements + 1));
+			Data[NumElements++] = Element;
+			MaxElements = NumElements;
+		}
+	}
+	inline void Free()
+	{
+		static auto FreeInternal = reinterpret_cast<void(*)(void*)>(reinterpret_cast<uintptr_t>(GetModuleHandle(0)) + Offset::Free);
+		FreeInternal(Data);
+		Data = nullptr;
+		NumElements = 0;
+		MaxElements = 0;
+	}
+
+	inline T& operator[](int32 index)
+	{
+		return Data[index];
+	}
+};)" << "\n\n";
+
+	stream << R"(class FString : public TArray<wchar_t>
+{
+public:
+	inline FString() = default;
+
+	inline FString(const wchar_t* Wcha)
+	{
+		MaxElements = NumElements = *Wcha ? wcslen(Wcha) + 1 : 0;
+		NumElements ? Data = const_cast<wchar_t*>(Wcha) : Data = nullptr;
+	}
+
+	inline std::string ToString()
+	{
+		if (IsValid())
+		{
+			std::wstring wStr(Data);
+			return std::string(wStr.begin(), wStr.end());
+		}
+		return "";
+	}
+	inline std::wstring ToWString()
+	{
+		if(IsValid())
+		{
+			return std::wstring(data);
+		}
+
+		return L"";
+	}
+	inline const wchar_t* c_str()
+	{
+		return Data;
+	}
+
+	inline FString operator=(const wchar_t*&& Other)
+	{
+		return FString(Other);
+	}
+};)" << "\n\n";
+
+	stream << R"(class FName
+{
+public:
+	int32 ComparisonIndex;
+	int32 Number;
+
+	std::string ToString() const
+	{
+		if (!this)
+		{
+			return "";
+		}
+
+		static auto ToStr = reinterpret_cast<void(*)(const FName*, FString&)>(reinterpret_cast<uintptr_t>(GetModuleHandle(0)) + 0x117C420);
+
+		FString OutStr;
+		ToStr(this, OutStr);
+
+		std::string OutName = OutStr.ToString();
+		OutStr.Free();
+
+		if (number > 0)
+		{
+			OutName += '_' + std::to_string(Number);
+		}
+
+		auto pos = OutName.rfind('/');
+		if (pos == std::string::npos)
+		{
+			return OutName;
+		}
+
+		return OutName.substr(pos + 1);
+	}
+
+	inline bool operator==(FName Other)
+	{
+		return ComparisonIndex == Other.ComparisonIndex;
+	}
+	inline bool operator!=(FName Other)
+	{
+		return !(operator==);
+	}
+};)" << "\n\n";
+
+	stream << R"(template<typename _Value, typename _Key>
+class TPair
+{
+public:
+	_Value Value;
+	_Key Key;
+};
+
+
+class UClass;
+class UProperty;
+
+)" << "\n\n";
+
+	stream << R"(class FUObjectItem
+{
+public:
+	UObject* Object;
+	int32_t IndexAndFlags;
+	int32_t SerialNumber;
+	int8_t Pad_1337[0x8];
+
+	bool IsPendingKill()
+	{
+		return !!(IndexAndFlags & (1 << 29));
+	}
+};)" << "\n\n";
+
+	stream << R"(class TUObjectArray
+{
+public:
+	FUObjectItem* Objects;
+	int32_t MaxNumElements;
+	int32_t NumElements;
+};)" << "\n\n";
+
+	stream << R"(class FUObjectArray
+{
+public:
+	uint8_t Pad[0x10];
+	TUObjectArray ObjObjects;
+
+	inline UObject* ByIndex(int32_t Index)
+	{
+		return ObjObjects.Objects[Index].Object;
+	}
+	inline int32_t Num()
+	{
+		return ObjObjects.NumElements;
+	}
+};)" << "\n\n";
+
+	stream << R"(template<typename ElementType>
+class TSet
+{
+public:
+
+};
+
+template<typename Value, typename Key>
+class TMap
+{
+public:
+
+};)" << "\n\n";
+
+	stream << R"(class FWeakObjectPtr
+{
+	int32_t		ObjectIndex;
+	int32_t		ObjectSerialNumber;
+
+public:
+	inline bool operator==(FWeakObjectPtr Other)
+	{
+		return ObjectIndex == Other.ObjectIndex && ObjectSerialNumber == Other.ObjectSerialNumber;
+	}
+	inline bool operator!=(FWeakObjectPtr Other)
+	{
+		return !(operator==(Other));
+	}
+	inline FWeakObjectPtr& operator=(const FWeakObjectPtr& Other)
+	{
+		ObjectIndex = Other.ObjectIndex;
+		ObjectSerialNumber = Other.ObjectSerialNumber;
+	}
+
+	inline UObject* GetUObject() const
+	{
+		return GObjects->ByIndex(ObjectIndex);
+	}
+};)" << "\n\n";
+
+	stream << R"(template<typename ObjectType, class TWeakObjectPtrBase = FWeakObjectPtr>
+class TWeakObjectPtr : public TWeakObjectPtrBase
+{
+	inline UObject* Get() const
+	{
+		return TWeakObjectPtrBase::GetUObject();
+	}
+	inline ObjectType* GetCastet() const
+	{
+		return static_cast<ObjectType*>(Get());
+	}
+	inline UObject* operator*()
+	{
+		return Get();
+	}
+	inline UObject* operator->()
+	{
+		return Get();
+	}
+};)" << "\n\n";
+
+	stream << R"(class FScriptInterface
+{
+	UObject* ObjectPointer;
+	void* InterfacePointer;
+
+public:
+
+	inline UObject* GetObjPtr()
+	{
+		return ObjectPointer;
+	}
+	inline void* GetInterface()
+	{
+		return InterfacePointer; //literally no fucking idea what's the use of a interface, but why not make a function to get it
+	}
+};)" << "\n\n";
+
+	stream << R"(template<typename TObjectID>
+class TPersistentObjectPtr
+{
+	mutable TWeakObjectPtr<UObject> WeakPtr;
+	mutable int32_t TagAtLastTest;
+	TObjectID ObjectID;
+};)" << "\n\n";
+
+	stream << R"(class FUniqueObjectGuid
+{
+public:
+	int8_t Pad134[0x10];
+};
+
+class FLazyObjectPtr : public TPersistentObjectPtr<FUniqueObjectGuid>
+{
+public:
+
+};
+
+class FText
+{
+public:
+	int8_t Pad_99[0x18];
+};)" << "\n\n";
+
+	PrintFileEnding(stream, FileType::OtherHeader);
 }
 
 fs::path Generator::genPath;
 std::unordered_map<std::string, std::vector<Generator::PredefinedMember>> Generator::predefinedMembers;
+std::unordered_map<std::string, std::vector<Generator::PredefinedFunction>> Generator::predefinedFunctions;

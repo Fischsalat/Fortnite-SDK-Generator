@@ -10,9 +10,10 @@
 
 //To do:
 /*
-* 
+* Basic.hpp and Basic.cpp files
 *
 */
+
 
 DWORD WINAPI Main(LPVOID lpParam)
 {
@@ -22,7 +23,6 @@ DWORD WINAPI Main(LPVOID lpParam)
 	freopen_s(&p, "CONIN$", "r", stdin);
 
 	UEObjectStore::Initialize();
-	ObjectStore = new UEObjectStore();
 
 	std::cout << "search" << std::endl;
 	
@@ -33,7 +33,7 @@ DWORD WINAPI Main(LPVOID lpParam)
 	
 	std::unordered_map<int32, std::vector<int32>> map;
 
-	for (auto obj : *ObjectStore)
+	for (auto obj : UEObjectStore())
 	{
 		if (!obj.IsValid())
 		{
