@@ -94,7 +94,9 @@ void UEObjectStore::GetAllPackages(std::unordered_map<int32, std::vector<int32>>
 	for (auto obj : UEObjectStore())
 	{
 		if (!obj.IsValid())
+		{
 			continue;
+		}
 
 		if (!obj.IsA(UEPackage::StaticClass()))
 		{

@@ -253,7 +253,7 @@ void Generator::GenerateClassFile(const std::vector<Package::Class>& classes, st
 
 		stream << clss.cppFullName << "\n{\npublic:\n";
 
-		if (predefinedMembers.find(clss.fullName) != std::end(predefinedMembers))
+		if (predefinedMembers.find(clss.fullName) != predefinedMembers.end())
 		{			
 			for (auto member : predefinedMembers[clss.fullName])
 			{
@@ -295,6 +295,21 @@ void Generator::GenerateClassFile(const std::vector<Package::Class>& classes, st
 		
 		stream << "\t}\n";
 
+
+		if (predefinedFunctions.find(clss.fullName) != predefinedFunctions.end())
+		{
+			for (auto func : predefinedFunctions[clss.fullName])
+			{
+				if (func.bDefineInHeader)
+				{
+					stream << std::format("{}{}\n{}\n\n", func.templateText, func.declaration, func.body);
+				}
+				else
+				{
+					stream << std::format("{}\n\n", func.declaration);
+				}
+			}
+		}
 		if (!clss.functions.empty())
 		{
 			stream << "\n";
@@ -307,7 +322,9 @@ void Generator::GenerateClassFile(const std::vector<Package::Class>& classes, st
 					stream << func.params[i].typedName;
 
 					if (i != func.params.size() - 1)
+					{
 						stream << ", ";
+					}
 				}
 				stream << ");\n";
 			}
@@ -495,7 +512,7 @@ Generator::Generator()
 			R"(return GetVFunction<void(*)(UObject*, class UFunction*, void*)>(this, /*PE-INDEX*/)(this, Func, Parms);)"
 		},
 		{
-			true, "template<class UE_Type = UObject>", "UE_Type FindObject(const std::string&& ObjName)", "",
+			true, "template<class UE_Type = UObject>\n", "UE_Type FindObject(const std::string&& ObjName)", "",
 			R"(for(int i = 0; i < GObjects->Num(); i++)
 {
 	UObject* Obj = GObjects->GetByIndex(i);
@@ -517,7 +534,7 @@ return nullptr;)"
 			R"(return FindObject<UClass>(name);)"
 		},
 		{
-			true, "template<class UE_Type = UObject>", "UE_Type GetByIndex(int32_t Index)", "",
+			true, "template<class UE_Type = UObject>\n", "UE_Type GetByIndex(int32_t Index)", "",
 			R"(return static_cast<UE_Type>(GObjects->ObjObjects.Objects[Index].object);)"
 		}
 	};
@@ -532,13 +549,13 @@ void Generator::GenerateBasicFile(const fs::path& sdkPath)
 
 	stream << R"(class UObject;
 
-template<class T>
+template<class DataType>
 class TArray
 {
 	friend class FString;
 
 private:
-	T* Data;
+	DataType* Data;
 	int32_t NumElements;
 	int32_t MaxElements;
 
@@ -568,7 +585,7 @@ public:
 		}
 		else
 		{
-			Data = reinterpret_cast<T*>(realloc(Data, sizeof(T) * NumElements + 1));
+			Data = reinterpret_cast<T*>(realloc(Data, sizeof(DataType) * NumElements + 1));
 			Data[NumElements++] = Element;
 			MaxElements = NumElements;
 		}
@@ -582,7 +599,7 @@ public:
 		MaxElements = 0;
 	}
 
-	inline T& operator[](int32 index)
+	inline DataType& operator[](int32 index)
 	{
 		return Data[index];
 	}
@@ -673,12 +690,12 @@ public:
 	}
 };)" << "\n\n";
 
-	stream << R"(template<typename _Value, typename _Key>
+	stream << R"(template<typename ValueType, typename KeyType>
 class TPair
 {
 public:
-	_Value Value;
-	_Key Key;
+	ValueType Value;
+	KeyType Key;
 };
 
 
@@ -715,9 +732,10 @@ public:
 	uint8_t Pad[0x10];
 	TUObjectArray ObjObjects;
 
-	inline UObject* ByIndex(int32_t Index)
+	template<class UE_Type = UObject>
+	inline UE_Type* ByIndex(int32_t Index)
 	{
-		return ObjObjects.Objects[Index].Object;
+		return static_cast<UE_Type>(ObjObjects.Objects[Index].Object);
 	}
 	inline int32_t Num()
 	{
@@ -732,7 +750,7 @@ public:
 
 };
 
-template<typename Value, typename Key>
+template<typename ValueType, typename KeyType>
 class TMap
 {
 public:
