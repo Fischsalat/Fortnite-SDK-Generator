@@ -15,13 +15,10 @@ private:
 	};
 	struct PredefinedFunction
 	{
-		bool bIsStatic;
-		bool bIsTemplate;
 		bool bDefineInHeader;
-		bool bActuallyInline;
-		std::string returnType;
-		std::string name;
-		std::string allParams;
+		std::string templateText;
+		std::string declaration;
+		std::string outOfLineDeclaration;
 		std::string body;
 	};
 	enum class FileType
@@ -41,7 +38,7 @@ private:
 public:
 	Generator();
 
-	void Generate();
+	static void Generate();
 
 private:
 	void ProcessPackages(const fs::path& sdkPath, std::vector<std::string>& outNames);

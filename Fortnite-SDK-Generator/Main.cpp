@@ -22,14 +22,11 @@ DWORD WINAPI Main(LPVOID lpParam)
 	freopen_s(&p, "CONOUT$", "w", stdout);
 	freopen_s(&p, "CONIN$", "r", stdin);
 
-	UEObjectStore::Initialize();
-
 	std::cout << "search" << std::endl;
 	
 	std::cout << std::format("Hello{:{}X}", 0xFF, 50) << "\n\n\n";
 
-	Generator sdkGen;
-	sdkGen.Generate();
+	Generator::Generate();
 	
 	std::unordered_map<int32, std::vector<int32>> map;
 

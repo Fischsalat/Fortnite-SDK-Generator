@@ -3,6 +3,10 @@
 
 void Generator::Generate()
 {
+	Generator sdkGen;
+
+	UEObjectStore::Initialize();
+
 	genPath = fs::path(Settings::GetPath());
 
 	if (!genPath.is_absolute())
@@ -15,10 +19,10 @@ void Generator::Generate()
 
 	std::vector<std::string> packageNames;
 	
-	ProcessPackages(genPath / "SDK", packageNames);
-	GenerateBasicFile(genPath);
+	sdkGen.ProcessPackages(genPath / "SDK", packageNames);
+	sdkGen.GenerateBasicFile(genPath / "SDK");
 
-	CreateSDKHeaderFile(genPath, packageNames);
+	sdkGen.CreateSDKHeaderFile(genPath, packageNames);
 }
 
 void Generator::ProcessPackages(const fs::path& sdkPath, std::vector<std::string>& outNames)
@@ -487,41 +491,34 @@ Generator::Generator()
 	predefinedFunctions["Class CoreUObject.Object"] =
 	{
 		{
-			false, false, true, true, "void", "ProcessEvent", "class UFunction* func, void* parms",
-			R"(return GetVFunction<void(*)(UObject*, class UFunction*, void*)>(this, /*PE-INDEX*/)(this, function, parms);)"
+			true, "", "void ProcessEvent(class UFunction* Func, void* Parms", "",
+			R"(return GetVFunction<void(*)(UObject*, class UFunction*, void*)>(this, /*PE-INDEX*/)(this, Func, Parms);)"
 		},
 		{
-			true, true, true, false, "T*", "FindObject", "const std::string&& name",
+			true, "template<class UE_Type = UObject>", "UE_Type FindObject(const std::string&& ObjName)", "",
 			R"(for(int i = 0; i < GObjects->Num(); i++)
 {
-	UObject* obj = GObjects->GetByIndex(i);
+	UObject* Obj = GObjects->GetByIndex(i);
 
-	if(!obj)
+	if(!Obj)
 	{
 		continue;
 	}
 
-	if(obj.GetFullName() == name)
+	if(Obj.GetFullName() == name)
 	{
-		return static_cast<T*>(obj);
+		return static_cast<UE_Type*>(Obj);
 	}
 }
 return nullptr;)"
 		},
 		{
-			true, false, true, true, "UClass*", "GetByIndex", "const std::string&& name",
-			R"(return FindObject<UObject>(name);)"
+			true, "", "UClass* FindClass(const std::string&& name)", "",
+			R"(return FindObject<UClass>(name);)"
 		},
 		{
-			true, false, true, true, "UObject*", "int index",
-			R"(return GObjects->ObjObjects.Objects[index].object;)"
-		},
-		{
-			true, true, true, true, "T*", "GetCasted", "int index",
-			R"(return static_cast<T*>(GetByIndex(index));)"
-		},
-		{
-
+			true, "template<class UE_Type = UObject>", "UE_Type GetByIndex(int32_t Index)", "",
+			R"(return static_cast<UE_Type>(GObjects->ObjObjects.Objects[Index].object);)"
 		}
 	};
 }

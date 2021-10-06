@@ -79,7 +79,7 @@ public:
 	};
 	struct Class : public Struct
 	{
-		int32 index;				// 0x5FD
+		int32 index;
 		std::vector<Function> functions;
 	};
 
