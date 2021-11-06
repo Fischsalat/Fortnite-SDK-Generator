@@ -7,3 +7,6 @@ Currently supported:
 
 
 Oh yea, btw. obviously based on KN4CK3Rs UnrealEngine-SDK-Generator.
+
+
+Yea well, semi-discontinued. I'm lazy and bored of this project.
